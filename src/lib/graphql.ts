@@ -1,26 +1,30 @@
-import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
-import { setContext } from '@apollo/client/link/context';
+import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
+import { setContext } from "@apollo/client/link/context";
 
 // GraphQL endpoint
 const httpLink = createHttpLink({
-  uri: 'http://localhost:4000/graphql',
+  uri: "http://localhost:4000/graphql",
 });
 
 // Auth link to add token to headers
 const authLink = setContext((_, { headers }) => {
-  const token = localStorage.getItem('authToken');
+  let token = null;
+  if (typeof window !== "undefined") {
+    token = localStorage.getItem("accessToken");
+  }
   return {
     headers: {
       ...headers,
       authorization: token ? `Bearer ${token}` : "",
-    }
-  }
+    },
+  };
 });
 
 // Apollo Client
 export const client = new ApolloClient({
   link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
+  ssrMode: typeof window === "undefined", // Enable SSR mode on server
 });
 
 // Auth types

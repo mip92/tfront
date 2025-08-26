@@ -22,24 +22,27 @@ A modern Next.js application with GraphQL authentication, built with TypeScript 
 
 ## Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
 - GraphQL server running at `http://localhost:4000/graphql`
 
 ## Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/mip92/tfront.git
 cd tfront
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Start the development server:
+
 ```bash
 npm run dev
 ```
@@ -71,6 +74,7 @@ src/
 Your GraphQL server should implement these mutations:
 
 ### Login
+
 ```graphql
 mutation Login($email: String!, $password: String!) {
   login(email: $email, password: $password) {
@@ -85,6 +89,7 @@ mutation Login($email: String!, $password: String!) {
 ```
 
 ### Register
+
 ```graphql
 mutation Register($email: String!, $password: String!, $username: String) {
   register(email: $email, password: $password, username: $username) {
@@ -99,6 +104,7 @@ mutation Register($email: String!, $password: String!, $username: String) {
 ```
 
 ### Logout
+
 ```graphql
 mutation Logout {
   logout
