@@ -10,6 +10,7 @@ interface AuthContextType {
   login: (accessToken: string, refreshToken: string, user: UserAuth) => void;
   logout: () => void;
   isAuthenticated: boolean;
+  isInitialized: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -100,6 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     login,
     logout,
     isAuthenticated: !!accessToken,
+    isInitialized,
   };
 
   // Don't render until we've checked localStorage
