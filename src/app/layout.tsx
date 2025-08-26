@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import Header from "@/components/Header";
+import LayoutWrapper from "@/components/LayoutWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tattoo Client - GraphQL App",
-  description: "Next.js application with GraphQL authentication",
+  title: "Tattoo Client",
+  description: "A modern Next.js application with GraphQL authentication",
 };
 
 export default function RootLayout({
@@ -32,8 +32,7 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <Providers>
-            <Header />
-            {children}
+            <LayoutWrapper>{children}</LayoutWrapper>
           </Providers>
         </ThemeProvider>
       </body>
