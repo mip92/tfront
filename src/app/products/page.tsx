@@ -1,123 +1,75 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Search, Filter, Package, Loader2 } from "lucide-react";
 import { AsyncGenericList } from "@/components/AsyncGenericList";
 import { ProductSkeleton } from "@/components/ProductSkeleton";
-import { useGetProductsWithPaginationQuery } from "@/generated/graphql";
-
-// Type for products from the pagination query
-type ProductFromQuery = {
-  __typename?: "ProductWithBrand";
-  id: number;
-  name: string;
-  brandId: number;
-  createdAt: string;
-  type: any;
-  updatedAt: string;
-  brand: {
-    __typename?: "Brand";
-    name: string;
-  };
-};
-
-const take = 5;
+import {
+  useProductsInfinite,
+  type ProductFromQuery,
+} from "@/hooks/useProductsInfinite";
 
 export default function ProductsPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [allProducts, setAllProducts] = useState<{
-    rows: ProductFromQuery[];
-    total: number;
-  }>({ rows: [], total: 0 });
+  const { productsData, loadMore, loading, loadingMore, error, refetch, take } =
+    useProductsInfinite(searchTerm);
 
-  const { loading, error, data, refetch, fetchMore } =
-    useGetProductsWithPaginationQuery({
-      skip: true,
-      fetchPolicy: "network-only",
-      variables: {
+  // Логируем состояние для отладки
+  console.log("ProductsPage state:", {
+    loading,
+    loadingMore,
+    productsCount: productsData.rows.length,
+    total: productsData.total,
+  });
+
+  const handleSearch = useCallback(
+    (value: string) => {
+      setSearchTerm(value);
+      // Reset cache for new search by refetching
+      refetch({
         query: {
           skip: 0,
           take,
-          search: searchTerm || undefined,
-        },
-      },
-    });
-
-  const handleSearch = (value: string) => {
-    setSearchTerm(value);
-  };
-
-  const loadMore = async (
-    skip: number,
-    take: number
-  ): Promise<{ rows: ProductFromQuery[]; total: number }> => {
-    try {
-      const result = await fetchMore({
-        variables: {
-          query: {
-            skip: skip,
-            take: take,
-            search: searchTerm || undefined,
-          },
+          search: value || undefined,
         },
       });
+    },
+    [refetch, take]
+  );
 
-      if (result.data?.productsWithPagination?.rows) {
-        const newProducts =
-          result.data.productsWithPagination.rows.filter(Boolean);
-        setAllProducts((prev) => ({
-          rows: [...prev.rows, ...newProducts],
-          total: result.data?.productsWithPagination?.total || prev.total,
-        }));
-      }
-
-      return {
-        rows: result.data?.productsWithPagination?.rows || [],
-        total: result.data?.productsWithPagination?.total || 0,
-      };
-    } catch (error) {
-      console.error("Error loading more products:", error);
-      return {
-        rows: [],
-        total: 0,
-      };
-    }
-  };
-
-  useEffect(() => {
-    if (data?.productsWithPagination) {
-      setAllProducts(data.productsWithPagination);
-    }
-  }, [data]);
-
-  const renderProduct = (product: ProductFromQuery) => (
-    <Card key={product.id} className="overflow-hidden">
-      <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
-        <Package className="h-16 w-16 text-gray-400" />
-      </div>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg">{product.name}</CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Brand: {product.brand.name} | ID: {product.id}
-        </p>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-lg font-semibold text-foreground">Product</span>
-          <span className="text-sm text-muted-foreground">Available</span>
+  const renderProduct = useCallback(
+    (product: ProductFromQuery) => (
+      <Card key={product.id} className="overflow-hidden">
+        <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
+          <Package className="h-16 w-16 text-gray-400" />
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="flex-1">
-            Edit
-          </Button>
-          <Button variant="outline" size="sm" className="flex-1">
-            View
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg">{product.name}</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Brand: {product.brand.name} | ID: {product.id}
+          </p>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-lg font-semibold text-foreground">
+              Product
+            </span>
+            <span className="text-sm text-muted-foreground">Available</span>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="flex-1">
+              Edit
+            </Button>
+            <Button variant="outline" size="sm" className="flex-1">
+              View
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    ),
+    []
   );
 
   if (error) {
@@ -133,6 +85,7 @@ export default function ProductsPage() {
       </div>
     );
   }
+
   return (
     <div className="min-h-screen bg-muted/50">
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -141,7 +94,7 @@ export default function ProductsPage() {
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground">Products</h1>
             <p className="text-muted-foreground mt-2">
-              Manage your product catalog and inventory ({allProducts.total}{" "}
+              Manage your product catalog and inventory ({productsData.total}{" "}
               products)
             </p>
           </div>
@@ -171,7 +124,7 @@ export default function ProductsPage() {
           </div>
 
           {/* Loading State */}
-          {loading && (
+          {loading && productsData.rows.length === 0 && (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
               <span className="ml-2 text-muted-foreground">
@@ -180,13 +133,15 @@ export default function ProductsPage() {
             </div>
           )}
 
-          {!loading && (
+          {/* Products List */}
+          {productsData.rows.length > 0 && (
             <AsyncGenericList<ProductFromQuery>
-              items={allProducts}
+              items={productsData}
               loadMore={loadMore}
               renderItem={renderProduct}
               skeletonComponent={<ProductSkeleton />}
               take={take}
+              isLoading={loadingMore} // Используем loadingMore для skeleton
               gridCols={{
                 xs: 1,
                 sm: 2,
@@ -198,7 +153,8 @@ export default function ProductsPage() {
             />
           )}
 
-          {!loading && allProducts.rows.length === 0 && (
+          {/* Empty State */}
+          {!loading && productsData.rows.length === 0 && (
             <div className="text-center py-12">
               <Package className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">

@@ -16,6 +16,7 @@ interface AsyncGenericListProps<T> {
   take?: number;
   loadingText?: string;
   noMoreItemsText?: string;
+  isLoading?: boolean;
   gridCols?: {
     xs?: number;
     sm?: number;
@@ -34,6 +35,7 @@ export const AsyncGenericList = <T,>({
   take = 10,
   loadingText = "Loading more items...",
   noMoreItemsText = "No more items to load",
+  isLoading = false, // Состояние загрузки из Apollo
   gridCols = {
     xs: 1,
     sm: 2,
@@ -43,29 +45,29 @@ export const AsyncGenericList = <T,>({
   },
   spacing = 6,
 }: AsyncGenericListProps<T>) => {
-  const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  //const [skip, setSkip] = useState(initial.rows.length);
+
+  // Reset hasMore when items change (e.g., new search)
+  useEffect(() => {
+    setHasMore(true);
+  }, [items.rows.length]);
 
   const handleLoadMore = useCallback(async () => {
-    if (loading || !hasMore) return;
-    setLoading(true);
+    if (isLoading || !hasMore) return;
 
     try {
-      const response = await loadMore(items.rows.length, take); // ⚡️ считаем от длины rows
+      const response = await loadMore(items.rows.length, take);
       const { rows: newItems, total } = response;
-
       if (
         newItems.length === 0 ||
         items.rows.length + newItems.length >= total
       ) {
         setHasMore(false);
       }
-      // setSkip(items.rows.length + newItems.length);
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error("Error loading more items:", error);
     }
-  }, [items.rows.length, loading, hasMore, loadMore, take]);
+  }, [items.rows.length, isLoading, hasMore, loadMore, take]);
 
   useEffect(() => {
     const hiddenDiv = document.querySelector("[data-hidden-loader]");
@@ -74,7 +76,7 @@ export const AsyncGenericList = <T,>({
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && hasMore && !loading) {
+          if (entry.isIntersecting && hasMore && !isLoading) {
             handleLoadMore();
           }
         });
@@ -91,7 +93,7 @@ export const AsyncGenericList = <T,>({
     return () => {
       observer.disconnect();
     };
-  }, [hasMore, loading, handleLoadMore]);
+  }, [hasMore, isLoading, handleLoadMore]);
 
   // Generate responsive grid classes
   const getGridClasses = () => {
@@ -104,6 +106,8 @@ export const AsyncGenericList = <T,>({
     return classes.join(" ");
   };
 
+  const showSkeleton = isLoading;
+
   return (
     <>
       <div className={`grid gap-${spacing} ${getGridClasses()}`}>
@@ -111,7 +115,7 @@ export const AsyncGenericList = <T,>({
           <div key={index}>{renderItem(item)}</div>
         ))}
 
-        {loading &&
+        {showSkeleton &&
           Array.from({ length: take }).map((_, index) => (
             <div key={`skeleton-${index}`}>{SkeletonComponent}</div>
           ))}
@@ -119,7 +123,7 @@ export const AsyncGenericList = <T,>({
         <div data-hidden-loader className="h-2.5 w-full mt-2.5" />
       </div>
 
-      {loading && (
+      {showSkeleton && (
         <div className="flex justify-center py-4">
           <div className="flex items-center space-x-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />

@@ -23,7 +23,31 @@ const authLink = setContext((_, { headers }) => {
 // Apollo Client
 export const client = new ApolloClient({
   link: authLink.concat(httpLink),
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          productsWithPagination: {
+            // Учитываем поиск в ключе кэша, чтобы разные поиски не смешивались
+            keyArgs: ["query", ["search"]],
+            // Автоматически мержим новые данные с существующими
+            merge(existing = { rows: [], total: 0 }, incoming) {
+              // Если это первый запрос (skip: 0), возвращаем как есть
+              if (incoming.rows.length > 0 && existing.rows.length === 0) {
+                return incoming;
+              }
+
+              // Если это подгрузка (fetchMore), добавляем новые элементы к существующим
+              return {
+                total: incoming.total,
+                rows: [...existing.rows, ...incoming.rows],
+              };
+            },
+          },
+        },
+      },
+    },
+  }),
   ssrMode: typeof window === "undefined", // Enable SSR mode on server
 });
 
