@@ -22,7 +22,6 @@ export interface PaginationOutResponse<T> {
 
 const take = 5;
 
-// Custom hook for infinite products loading
 export function useProductsInfinite(searchTerm: string) {
   const [loadingMore, setLoadingMore] = useState(false);
 

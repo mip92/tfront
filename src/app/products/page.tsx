@@ -16,18 +16,9 @@ export default function ProductsPage() {
   const { productsData, loadMore, loading, loadingMore, error, refetch, take } =
     useProductsInfinite(searchTerm);
 
-  // Логируем состояние для отладки
-  console.log("ProductsPage state:", {
-    loading,
-    loadingMore,
-    productsCount: productsData.rows.length,
-    total: productsData.total,
-  });
-
   const handleSearch = useCallback(
     (value: string) => {
       setSearchTerm(value);
-      // Reset cache for new search by refetching
       refetch({
         query: {
           skip: 0,
@@ -141,7 +132,7 @@ export default function ProductsPage() {
               renderItem={renderProduct}
               skeletonComponent={<ProductSkeleton />}
               take={take}
-              isLoading={loadingMore} // Используем loadingMore для skeleton
+              isLoading={loadingMore}
               gridCols={{
                 xs: 1,
                 sm: 2,
@@ -153,7 +144,6 @@ export default function ProductsPage() {
             />
           )}
 
-          {/* Empty State */}
           {!loading && productsData.rows.length === 0 && (
             <div className="text-center py-12">
               <Package className="h-16 w-16 text-gray-400 mx-auto mb-4" />
