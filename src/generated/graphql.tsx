@@ -144,16 +144,39 @@ export type MutationUpdateUserArgs = {
   id: Scalars['Int']['input'];
 };
 
+export type PaginatedProductsResponse = {
+  __typename?: 'PaginatedProductsResponse';
+  rows: Array<ProductWithBrand>;
+  total: Scalars['Int']['output'];
+};
+
 export type ProductInput = {
   brandId: Scalars['Int']['input'];
   name: Scalars['String']['input'];
-  type: Scalars['String']['input'];
+  type: ProductType;
 };
+
+/** Поле для сортировки продуктов */
+export enum ProductSortField {
+  CreatedAt = 'CREATED_AT',
+  Id = 'ID',
+  Name = 'NAME',
+  Type = 'TYPE',
+  UpdatedAt = 'UPDATED_AT'
+}
+
+/** Тип продукта */
+export enum ProductType {
+  Cartridge = 'CARTRIDGE',
+  Gel = 'GEL',
+  Paint = 'PAINT',
+  Transfer = 'TRANSFER'
+}
 
 export type ProductUpdateInput = {
   brandId?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
-  type?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<ProductType>;
 };
 
 export type ProductWithBrand = {
@@ -163,8 +186,19 @@ export type ProductWithBrand = {
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['Int']['output'];
   name: Scalars['String']['output'];
-  type: Scalars['String']['output'];
+  type: ProductType;
   updatedAt: Scalars['DateTime']['output'];
+};
+
+export type ProductsQueryDto = {
+  brandId?: InputMaybe<Scalars['Int']['input']>;
+  ids?: InputMaybe<Array<Scalars['Int']['input']>>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  sortBy?: InputMaybe<ProductSortField>;
+  sortOrder?: InputMaybe<SortOrder>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+  type?: InputMaybe<ProductType>;
 };
 
 export type Query = {
@@ -174,6 +208,7 @@ export type Query = {
   products: Array<ProductWithBrand>;
   productsByBrand: Array<ProductWithBrand>;
   productsByType: Array<ProductWithBrand>;
+  productsWithPagination: PaginatedProductsResponse;
   role?: Maybe<Role>;
   roleByName?: Maybe<Role>;
   roles?: Maybe<Array<Role>>;
@@ -193,7 +228,12 @@ export type QueryProductsByBrandArgs = {
 
 
 export type QueryProductsByTypeArgs = {
-  type: Scalars['String']['input'];
+  type: ProductType;
+};
+
+
+export type QueryProductsWithPaginationArgs = {
+  query: ProductsQueryDto;
 };
 
 
@@ -203,7 +243,7 @@ export type QueryRoleArgs = {
 
 
 export type QueryRoleByNameArgs = {
-  name: Scalars['String']['input'];
+  name: RoleType;
 };
 
 
@@ -236,10 +276,22 @@ export type RoleInput = {
   name: Scalars['String']['input'];
 };
 
+/** Тип роли */
+export enum RoleType {
+  Admin = 'ADMIN',
+  User = 'USER'
+}
+
 export type RoleUpdateInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
 };
+
+/** Порядок сортировки */
+export enum SortOrder {
+  Asc = 'ASC',
+  Desc = 'DESC'
+}
 
 export type User = {
   __typename?: 'User';
@@ -294,17 +346,69 @@ export type UserUpdateInput = {
   roleId?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type LogoutMutationVariables = Exact<{
+  refreshToken: Scalars['String']['input'];
+}>;
+
+
+export type LogoutMutation = { __typename?: 'Mutation', logout: string };
+
 export type GetProductsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetProductsQuery = { __typename?: 'Query', products: Array<{ __typename?: 'ProductWithBrand', id: number, name: string }> };
+export type GetProductsQuery = { __typename?: 'Query', products: Array<{ __typename?: 'ProductWithBrand', id: number, name: string, brandId: number, createdAt: string, type: ProductType, updatedAt: string, brand: { __typename?: 'Brand', name: string } }> };
+
+export type GetProductsWithPaginationQueryVariables = Exact<{
+  query: ProductsQueryDto;
+}>;
 
 
+export type GetProductsWithPaginationQuery = { __typename?: 'Query', productsWithPagination: { __typename?: 'PaginatedProductsResponse', total: number, rows: Array<{ __typename?: 'ProductWithBrand', id: number, name: string, brandId: number, createdAt: string, type: ProductType, updatedAt: string, brand: { __typename?: 'Brand', name: string } }> } };
+
+
+export const LogoutDocument = gql`
+    mutation Logout($refreshToken: String!) {
+  logout(refreshToken: $refreshToken)
+}
+    `;
+export type LogoutMutationFn = Apollo.MutationFunction<LogoutMutation, LogoutMutationVariables>;
+
+/**
+ * __useLogoutMutation__
+ *
+ * To run a mutation, you first call `useLogoutMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLogoutMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [logoutMutation, { data, loading, error }] = useLogoutMutation({
+ *   variables: {
+ *      refreshToken: // value for 'refreshToken'
+ *   },
+ * });
+ */
+export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<LogoutMutation, LogoutMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument, options);
+      }
+export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
+export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
+export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
 export const GetProductsDocument = gql`
     query GetProducts {
   products {
     id
     name
+    brand {
+      name
+    }
+    brandId
+    createdAt
+    type
+    updatedAt
   }
 }
     `;
@@ -340,3 +444,54 @@ export type GetProductsQueryHookResult = ReturnType<typeof useGetProductsQuery>;
 export type GetProductsLazyQueryHookResult = ReturnType<typeof useGetProductsLazyQuery>;
 export type GetProductsSuspenseQueryHookResult = ReturnType<typeof useGetProductsSuspenseQuery>;
 export type GetProductsQueryResult = Apollo.QueryResult<GetProductsQuery, GetProductsQueryVariables>;
+export const GetProductsWithPaginationDocument = gql`
+    query GetProductsWithPagination($query: ProductsQueryDto!) {
+  productsWithPagination(query: $query) {
+    rows {
+      id
+      name
+      brand {
+        name
+      }
+      brandId
+      createdAt
+      type
+      updatedAt
+    }
+    total
+  }
+}
+    `;
+
+/**
+ * __useGetProductsWithPaginationQuery__
+ *
+ * To run a query within a React component, call `useGetProductsWithPaginationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetProductsWithPaginationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetProductsWithPaginationQuery({
+ *   variables: {
+ *      query: // value for 'query'
+ *   },
+ * });
+ */
+export function useGetProductsWithPaginationQuery(baseOptions: Apollo.QueryHookOptions<GetProductsWithPaginationQuery, GetProductsWithPaginationQueryVariables> & ({ variables: GetProductsWithPaginationQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetProductsWithPaginationQuery, GetProductsWithPaginationQueryVariables>(GetProductsWithPaginationDocument, options);
+      }
+export function useGetProductsWithPaginationLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetProductsWithPaginationQuery, GetProductsWithPaginationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetProductsWithPaginationQuery, GetProductsWithPaginationQueryVariables>(GetProductsWithPaginationDocument, options);
+        }
+export function useGetProductsWithPaginationSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetProductsWithPaginationQuery, GetProductsWithPaginationQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetProductsWithPaginationQuery, GetProductsWithPaginationQueryVariables>(GetProductsWithPaginationDocument, options);
+        }
+export type GetProductsWithPaginationQueryHookResult = ReturnType<typeof useGetProductsWithPaginationQuery>;
+export type GetProductsWithPaginationLazyQueryHookResult = ReturnType<typeof useGetProductsWithPaginationLazyQuery>;
+export type GetProductsWithPaginationSuspenseQueryHookResult = ReturnType<typeof useGetProductsWithPaginationSuspenseQuery>;
+export type GetProductsWithPaginationQueryResult = Apollo.QueryResult<GetProductsWithPaginationQuery, GetProductsWithPaginationQueryVariables>;

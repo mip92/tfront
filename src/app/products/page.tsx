@@ -1,29 +1,124 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Search, Filter, Package, Loader2 } from "lucide-react";
-import { useGetProductsQuery } from "@/generated/graphql";
+import { AsyncGenericList } from "@/components/AsyncGenericList";
+import { ProductSkeleton } from "@/components/ProductSkeleton";
+import { useGetProductsWithPaginationQuery } from "@/generated/graphql";
+
+// Type for products from the pagination query
+type ProductFromQuery = {
+  __typename?: "ProductWithBrand";
+  id: number;
+  name: string;
+  brandId: number;
+  createdAt: string;
+  type: any;
+  updatedAt: string;
+  brand: {
+    __typename?: "Brand";
+    name: string;
+  };
+};
+
+const take = 5;
 
 export default function ProductsPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [allProducts, setAllProducts] = useState<{
+    rows: ProductFromQuery[];
+    total: number;
+  }>({ rows: [], total: 0 });
 
-  const { loading, error, data, refetch } = useGetProductsQuery({
-    fetchPolicy: "cache-and-network",
-  });
+  const { loading, error, data, refetch, fetchMore } =
+    useGetProductsWithPaginationQuery({
+      skip: true,
+      fetchPolicy: "network-only",
+      variables: {
+        query: {
+          skip: 0,
+          take,
+          search: searchTerm || undefined,
+        },
+      },
+    });
 
-  const allProducts = data?.products || [];
-  
-  // Filter products locally based on search term
-  const products = allProducts.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Handle search
   const handleSearch = (value: string) => {
     setSearchTerm(value);
   };
+
+  const loadMore = async (
+    skip: number,
+    take: number
+  ): Promise<{ rows: ProductFromQuery[]; total: number }> => {
+    try {
+      const result = await fetchMore({
+        variables: {
+          query: {
+            skip: skip,
+            take: take,
+            search: searchTerm || undefined,
+          },
+        },
+      });
+
+      if (result.data?.productsWithPagination?.rows) {
+        const newProducts =
+          result.data.productsWithPagination.rows.filter(Boolean);
+        setAllProducts((prev) => ({
+          rows: [...prev.rows, ...newProducts],
+          total: result.data?.productsWithPagination?.total || prev.total,
+        }));
+      }
+
+      return {
+        rows: result.data?.productsWithPagination?.rows || [],
+        total: result.data?.productsWithPagination?.total || 0,
+      };
+    } catch (error) {
+      console.error("Error loading more products:", error);
+      return {
+        rows: [],
+        total: 0,
+      };
+    }
+  };
+
+  useEffect(() => {
+    if (data?.productsWithPagination) {
+      setAllProducts(data.productsWithPagination);
+    }
+  }, [data]);
+
+  const renderProduct = (product: ProductFromQuery) => (
+    <Card key={product.id} className="overflow-hidden">
+      <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
+        <Package className="h-16 w-16 text-gray-400" />
+      </div>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg">{product.name}</CardTitle>
+        <p className="text-sm text-muted-foreground">
+          Brand: {product.brand.name} | ID: {product.id}
+        </p>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-lg font-semibold text-foreground">Product</span>
+          <span className="text-sm text-muted-foreground">Available</span>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" className="flex-1">
+            Edit
+          </Button>
+          <Button variant="outline" size="sm" className="flex-1">
+            View
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   if (error) {
     return (
@@ -38,7 +133,6 @@ export default function ProductsPage() {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-muted/50">
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -47,7 +141,7 @@ export default function ProductsPage() {
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground">Products</h1>
             <p className="text-muted-foreground mt-2">
-              Manage your product catalog and inventory ({allProducts.length}{" "}
+              Manage your product catalog and inventory ({allProducts.total}{" "}
               products)
             </p>
           </div>
@@ -86,45 +180,25 @@ export default function ProductsPage() {
             </div>
           )}
 
-          {/* Products Grid */}
-          {!loading && products.length > 0 && (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {products.map((product) => (
-                <Card key={product.id} className="overflow-hidden">
-                  <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
-                    <Package className="h-16 w-16 text-gray-400" />
-                  </div>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg">{product.name}</CardTitle>
-                    <p className="text-sm text-muted-foreground">
-                      Product ID: {product.id}
-                    </p>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-lg font-semibold text-foreground">
-                        Product
-                      </span>
-                      <span className="text-sm text-muted-foreground">
-                        Available
-                      </span>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" className="flex-1">
-                        Edit
-                      </Button>
-                      <Button variant="outline" size="sm" className="flex-1">
-                        View
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+          {!loading && (
+            <AsyncGenericList<ProductFromQuery>
+              items={allProducts}
+              loadMore={loadMore}
+              renderItem={renderProduct}
+              skeletonComponent={<ProductSkeleton />}
+              take={take}
+              gridCols={{
+                xs: 1,
+                sm: 2,
+                md: 3,
+                lg: 4,
+                xl: 4,
+              }}
+              spacing={6}
+            />
           )}
 
-          {/* Empty State */}
-          {!loading && products.length === 0 && (
+          {!loading && allProducts.rows.length === 0 && (
             <div className="text-center py-12">
               <Package className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
@@ -139,20 +213,6 @@ export default function ProductsPage() {
                 <Plus className="h-4 w-4 mr-2" />
                 Add Product
               </Button>
-            </div>
-          )}
-
-          {/* Pagination */}
-          {!loading && allProducts.length > 0 && (
-            <div className="mt-8 flex items-center justify-center">
-              <div className="text-center">
-                <p className="text-muted-foreground mb-4">
-                  Showing {products.length} of {allProducts.length} products
-                </p>
-                <Button variant="outline" size="sm" onClick={() => refetch()}>
-                  Refresh Products
-                </Button>
-              </div>
             </div>
           )}
         </div>
