@@ -7,7 +7,7 @@ export type ProductFromQuery = {
   name: string;
   brandId: number;
   createdAt: string;
-  type: any;
+  type: string; // Changed from 'any' to 'string'
   updatedAt: string;
   brand: {
     __typename?: "Brand";
@@ -25,7 +25,13 @@ const take = 5;
 export function useProductsInfinite(searchTerm: string) {
   const [loadingMore, setLoadingMore] = useState(false);
 
-  const { loading, error, data, fetchMore, refetch } =
+  const {
+    loading,
+    error,
+    data,
+    fetchMore,
+    refetch,
+  } = // Added back error
     useGetProductsWithPaginationQuery({
       variables: {
         query: {
@@ -68,7 +74,7 @@ export function useProductsInfinite(searchTerm: string) {
         console.log("useProductsInfinite: fetchMore result:", {
           hasData: !!result.data?.productsWithPagination,
           newRows: result.data?.productsWithPagination?.rows?.length || 0,
-          total: result.data?.productsWithPagination?.total,
+          total: result.data.productsWithPagination?.total,
         });
 
         if (result.data?.productsWithPagination?.rows) {
@@ -101,7 +107,7 @@ export function useProductsInfinite(searchTerm: string) {
     loadMore,
     loading,
     loadingMore,
-    error,
+    error, // Return the actual error from GraphQL
     refetch,
     take,
   };
