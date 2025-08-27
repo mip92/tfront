@@ -41,6 +41,41 @@ export default function Header({
         </div>
 
         <div className="flex flex-1 items-center justify-end space-x-2">
+          {/* Navigation Menu */}
+          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium mr-4">
+            {isAuthenticated ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="transition-colors hover:text-blue-600 text-gray-700 dark:text-gray-300"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  href="/products"
+                  className="transition-colors hover:text-blue-600 text-gray-700 dark:text-gray-300"
+                >
+                  Products
+                </Link>
+                {user?.role?.name === "admin" && (
+                  <Link
+                    href="/admin"
+                    className="transition-colors hover:text-blue-600 text-gray-700 dark:text-gray-300"
+                  >
+                    Admin Panel
+                  </Link>
+                )}
+              </>
+            ) : (
+              <Link
+                href="/"
+                className="transition-colors hover:text-blue-600 text-gray-700 dark:text-gray-300"
+              >
+                Home
+              </Link>
+            )}
+          </nav>
+
           <div className="flex items-center space-x-2">
             <Button
               variant="ghost"

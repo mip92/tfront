@@ -16,6 +16,7 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  Package,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -48,6 +49,7 @@ const navigationItems: NavigationItem[] = [
   },
   { href: "/profile", label: "Profile", icon: User, requiresAuth: true },
   { href: "/settings", label: "Settings", icon: Settings, requiresAuth: true },
+  { href: "/products", label: "Products", icon: Package, requiresAuth: true },
 ];
 
 export default function Sidebar({
@@ -201,7 +203,6 @@ export default function Sidebar({
 
   return (
     <>
-      {/* Desktop Sidebar */}
       <div
         className={`hidden md:flex md:flex-col md:fixed md:inset-y-0 md:z-50 transition-all duration-300 ${
           isCollapsed ? "md:w-16" : "md:w-64"
@@ -212,7 +213,6 @@ export default function Sidebar({
         </div>
       </div>
 
-      {/* Mobile Sheet */}
       <Sheet open={isOpen} onOpenChange={onClose}>
         <SheetContent side="left" className="w-80 p-0">
           <SidebarContent />

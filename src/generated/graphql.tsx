@@ -25,6 +25,14 @@ export type AuthResponse = {
   user: UserAuth;
 };
 
+export type Brand = {
+  __typename?: 'Brand';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
 export type LoginInput = {
   email: Scalars['String']['input'];
   password: Scalars['String']['input'];
@@ -34,8 +42,10 @@ export type Mutation = {
   __typename?: 'Mutation';
   assignRole: User;
   assignRoleToUser: Role;
+  createProduct: ProductWithBrand;
   createRole: Role;
   createUser: User;
+  deleteProduct: ProductWithBrand;
   deleteRole: Role;
   deleteUser: User;
   login: AuthResponse;
@@ -43,6 +53,7 @@ export type Mutation = {
   refreshToken: AuthResponse;
   removeRole: User;
   removeRoleFromUser: Role;
+  updateProduct: ProductWithBrand;
   updateRole: Role;
   updateUser: User;
 };
@@ -60,6 +71,11 @@ export type MutationAssignRoleToUserArgs = {
 };
 
 
+export type MutationCreateProductArgs = {
+  input: ProductInput;
+};
+
+
 export type MutationCreateRoleArgs = {
   data: RoleInput;
 };
@@ -67,6 +83,11 @@ export type MutationCreateRoleArgs = {
 
 export type MutationCreateUserArgs = {
   data: UserInput;
+};
+
+
+export type MutationDeleteProductArgs = {
+  id: Scalars['Int']['input'];
 };
 
 
@@ -106,6 +127,12 @@ export type MutationRemoveRoleFromUserArgs = {
 };
 
 
+export type MutationUpdateProductArgs = {
+  id: Scalars['Int']['input'];
+  input: ProductUpdateInput;
+};
+
+
 export type MutationUpdateRoleArgs = {
   data: RoleUpdateInput;
   id: Scalars['Int']['input'];
@@ -117,14 +144,56 @@ export type MutationUpdateUserArgs = {
   id: Scalars['Int']['input'];
 };
 
+export type ProductInput = {
+  brandId: Scalars['Int']['input'];
+  name: Scalars['String']['input'];
+  type: Scalars['String']['input'];
+};
+
+export type ProductUpdateInput = {
+  brandId?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ProductWithBrand = {
+  __typename?: 'ProductWithBrand';
+  brand: Brand;
+  brandId: Scalars['Int']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  type: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
 export type Query = {
   __typename?: 'Query';
   getProfile: Scalars['String']['output'];
+  product: ProductWithBrand;
+  products: Array<ProductWithBrand>;
+  productsByBrand: Array<ProductWithBrand>;
+  productsByType: Array<ProductWithBrand>;
   role?: Maybe<Role>;
   roleByName?: Maybe<Role>;
   roles?: Maybe<Array<Role>>;
   user?: Maybe<User>;
   users: Array<User>;
+};
+
+
+export type QueryProductArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
+export type QueryProductsByBrandArgs = {
+  brandId: Scalars['Int']['input'];
+};
+
+
+export type QueryProductsByTypeArgs = {
+  type: Scalars['String']['input'];
 };
 
 
@@ -225,89 +294,49 @@ export type UserUpdateInput = {
   roleId?: InputMaybe<Scalars['Int']['input']>;
 };
 
-export type LoginMutationVariables = Exact<{
-  input: LoginInput;
-}>;
+export type GetProductsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'AuthResponse', access_token: string, refresh_token: string, user: { __typename?: 'UserAuth', id: number, email: string, firstName: string, lastName: string } } };
-
-export type LogoutMutationVariables = Exact<{
-  refreshToken: Scalars['String']['input'];
-}>;
+export type GetProductsQuery = { __typename?: 'Query', products: Array<{ __typename?: 'ProductWithBrand', id: number, name: string }> };
 
 
-export type LogoutMutation = { __typename?: 'Mutation', logout: string };
-
-
-export const LoginDocument = gql`
-    mutation Login($input: LoginInput!) {
-  login(input: $input) {
-    access_token
-    refresh_token
-    user {
-      id
-      email
-      firstName
-      lastName
-    }
+export const GetProductsDocument = gql`
+    query GetProducts {
+  products {
+    id
+    name
   }
 }
     `;
-export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
 
 /**
- * __useLoginMutation__
+ * __useGetProductsQuery__
  *
- * To run a mutation, you first call `useLoginMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useLoginMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
+ * To run a query within a React component, call `useGetProductsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetProductsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
  *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const [loginMutation, { data, loading, error }] = useLoginMutation({
+ * const { data, loading, error } = useGetProductsQuery({
  *   variables: {
- *      input: // value for 'input'
  *   },
  * });
  */
-export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>) {
+export function useGetProductsQuery(baseOptions?: Apollo.QueryHookOptions<GetProductsQuery, GetProductsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, options);
+        return Apollo.useQuery<GetProductsQuery, GetProductsQueryVariables>(GetProductsDocument, options);
       }
-export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
-export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
-export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
-export const LogoutDocument = gql`
-    mutation Logout($refreshToken: String!) {
-  logout(refreshToken: $refreshToken)
-}
-    `;
-export type LogoutMutationFn = Apollo.MutationFunction<LogoutMutation, LogoutMutationVariables>;
-
-/**
- * __useLogoutMutation__
- *
- * To run a mutation, you first call `useLogoutMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useLogoutMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [logoutMutation, { data, loading, error }] = useLogoutMutation({
- *   variables: {
- *      refreshToken: // value for 'refreshToken'
- *   },
- * });
- */
-export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<LogoutMutation, LogoutMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument, options);
-      }
-export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
-export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
-export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
+export function useGetProductsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetProductsQuery, GetProductsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetProductsQuery, GetProductsQueryVariables>(GetProductsDocument, options);
+        }
+export function useGetProductsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetProductsQuery, GetProductsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetProductsQuery, GetProductsQueryVariables>(GetProductsDocument, options);
+        }
+export type GetProductsQueryHookResult = ReturnType<typeof useGetProductsQuery>;
+export type GetProductsLazyQueryHookResult = ReturnType<typeof useGetProductsLazyQuery>;
+export type GetProductsSuspenseQueryHookResult = ReturnType<typeof useGetProductsSuspenseQuery>;
+export type GetProductsQueryResult = Apollo.QueryResult<GetProductsQuery, GetProductsQueryVariables>;
