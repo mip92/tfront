@@ -1,8 +1,11 @@
-import React from "react";
+"use client";
+
+import React, { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Package, ArrowLeft, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { useSetBreadcrumbs } from "@/hooks/useSetBreadcrumbs";
 
 interface ProductData {
   id: number;
@@ -26,6 +29,20 @@ export function ProductDetailClient({
   productId,
   productData,
 }: ProductDetailClientProps) {
+  const breadcrumbItems = useMemo(
+    () => [
+      { label: "Products", href: "/products", isActive: false },
+      {
+        label: productData?.name || `Product ${productId}`,
+        href: undefined,
+        isActive: true,
+      },
+    ],
+    [productData?.name, productId]
+  );
+
+  useSetBreadcrumbs(breadcrumbItems);
+
   if (!productData) {
     return (
       <div className="text-center py-12">

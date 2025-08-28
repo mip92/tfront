@@ -1,11 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Edit, Tag, Calendar, Hash, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useBrand } from "@/hooks/useBrand";
+import { useSetBreadcrumbs } from "@/hooks/useSetBreadcrumbs";
 
 export function BrandDetailClient({ brandId }: { brandId: string }) {
   const {
@@ -14,6 +15,20 @@ export function BrandDetailClient({ brandId }: { brandId: string }) {
     error,
     refetch,
   } = useBrand(parseInt(brandId));
+
+  const breadcrumbItems = useMemo(
+    () => [
+      { label: "Brands", href: "/brands", isActive: false },
+      {
+        label: brandData?.name || `Brand ${brandId}`,
+        href: undefined,
+        isActive: true,
+      },
+    ],
+    [brandData?.name, brandId]
+  );
+
+  useSetBreadcrumbs(breadcrumbItems);
 
   // Обработка ошибки
   if (error) {

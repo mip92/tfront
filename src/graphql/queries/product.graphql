@@ -12,4 +12,3 @@ query GetProduct($id: Int!) {
     }
   }
 }
-

@@ -1,11 +1,27 @@
 "use client";
 
+import React, { useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useSetBreadcrumbs } from "@/hooks/useSetBreadcrumbs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
-export function HomeClient() {
+export default function HomeClient() {
   const { isAuthenticated, user } = useAuth();
+
+  const breadcrumbItems = useMemo(
+    () => [{ label: "Home", href: "/", isActive: true }],
+    []
+  );
+
+  useSetBreadcrumbs(breadcrumbItems);
 
   return (
     <>

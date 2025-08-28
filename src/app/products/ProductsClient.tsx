@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Search, Filter, Package, Loader2 } from "lucide-react";
@@ -11,11 +11,19 @@ import {
   useProductsInfinite,
   type ProductFromQuery,
 } from "@/hooks/useProductsInfinite";
+import { useSetBreadcrumbs } from "@/hooks/useSetBreadcrumbs";
 
 export function ProductsClient() {
   const [searchTerm, setSearchTerm] = useState("");
   const { productsData, loadMore, loading, loadingMore, error, refetch, take } =
     useProductsInfinite(searchTerm);
+
+  const breadcrumbItems = useMemo(
+    () => [{ label: "Products", href: "/products", isActive: true }],
+    []
+  );
+
+  useSetBreadcrumbs(breadcrumbItems);
 
   const handleSearch = useCallback(
     (value: string) => {

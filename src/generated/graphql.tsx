@@ -49,15 +49,6 @@ export type BrandUpdateInput = {
   name?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type BrandWithProducts = {
-  __typename?: 'BrandWithProducts';
-  createdAt: Scalars['DateTime']['output'];
-  id: Scalars['Int']['output'];
-  name: Scalars['String']['output'];
-  products: Array<Product>;
-  updatedAt: Scalars['DateTime']['output'];
-};
-
 export type BrandsQueryDto = {
   ids?: InputMaybe<Array<Scalars['Int']['input']>>;
   search?: InputMaybe<Scalars['String']['input']>;
@@ -273,10 +264,8 @@ export type ProductsQueryDto = {
 export type Query = {
   __typename?: 'Query';
   brand: Brand;
-  brandWithProducts: BrandWithProducts;
   brands: Array<Brand>;
   brandsByIds: Array<Brand>;
-  brandsByName: Array<Brand>;
   brandsWithPagination: PaginatedBrandsResponse;
   getProfile: Scalars['String']['output'];
   product: ProductWithBrand;
@@ -295,18 +284,8 @@ export type QueryBrandArgs = {
 };
 
 
-export type QueryBrandWithProductsArgs = {
-  id: Scalars['Int']['input'];
-};
-
-
 export type QueryBrandsByIdsArgs = {
   ids: Array<Scalars['Int']['input']>;
-};
-
-
-export type QueryBrandsByNameArgs = {
-  name: Scalars['String']['input'];
 };
 
 
