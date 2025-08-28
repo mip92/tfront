@@ -9,16 +9,16 @@ import {
 } from "@/lib/server-graphql";
 
 interface ProductPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 // SEO метаданные для страницы продукта
 export async function generateMetadata({
   params,
 }: ProductPageProps): Promise<Metadata> {
-  const productId = params.id;
+  const { id: productId } = await params;
 
   // Загружаем реальные данные продукта для точных метаданных
   try {
@@ -82,14 +82,15 @@ async function getProductData(productId: string) {
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const product = await getProductData(params.id);
+  const { id: productId } = await params;
+  const product = await getProductData(productId);
 
   return (
     <div className="min-h-screen bg-muted/50">
       <main className="w-full py-6">
         <div className="w-full px-6">
           {/* Клиентский компонент для деталей продукта */}
-          <ProductDetailClient productId={params.id} productData={product} />
+          <ProductDetailClient productId={productId} productData={product} />
         </div>
       </main>
     </div>

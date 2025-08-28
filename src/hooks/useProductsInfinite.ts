@@ -71,12 +71,6 @@ export function useProductsInfinite(searchTerm: string) {
           },
         });
 
-        console.log("useProductsInfinite: fetchMore result:", {
-          hasData: !!result.data?.productsWithPagination,
-          newRows: result.data?.productsWithPagination?.rows?.length || 0,
-          total: result.data.productsWithPagination?.total,
-        });
-
         if (result.data?.productsWithPagination?.rows) {
           const newProducts =
             result.data.productsWithPagination.rows.filter(Boolean);

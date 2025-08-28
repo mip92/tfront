@@ -33,6 +33,40 @@ export type Brand = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export type BrandInput = {
+  name: Scalars['String']['input'];
+};
+
+/** Поле для сортировки брендов */
+export enum BrandSortField {
+  CreatedAt = 'CREATED_AT',
+  Id = 'ID',
+  Name = 'NAME',
+  UpdatedAt = 'UPDATED_AT'
+}
+
+export type BrandUpdateInput = {
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type BrandWithProducts = {
+  __typename?: 'BrandWithProducts';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  products: Array<Product>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type BrandsQueryDto = {
+  ids?: InputMaybe<Array<Scalars['Int']['input']>>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  sortBy?: InputMaybe<BrandSortField>;
+  sortOrder?: InputMaybe<SortOrder>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type LoginInput = {
   email: Scalars['String']['input'];
   password: Scalars['String']['input'];
@@ -42,9 +76,11 @@ export type Mutation = {
   __typename?: 'Mutation';
   assignRole: User;
   assignRoleToUser: Role;
+  createBrand: Brand;
   createProduct: ProductWithBrand;
   createRole: Role;
   createUser: User;
+  deleteBrand: Brand;
   deleteProduct: ProductWithBrand;
   deleteRole: Role;
   deleteUser: User;
@@ -53,6 +89,7 @@ export type Mutation = {
   refreshToken: AuthResponse;
   removeRole: User;
   removeRoleFromUser: Role;
+  updateBrand: Brand;
   updateProduct: ProductWithBrand;
   updateRole: Role;
   updateUser: User;
@@ -71,6 +108,11 @@ export type MutationAssignRoleToUserArgs = {
 };
 
 
+export type MutationCreateBrandArgs = {
+  input: BrandInput;
+};
+
+
 export type MutationCreateProductArgs = {
   input: ProductInput;
 };
@@ -83,6 +125,11 @@ export type MutationCreateRoleArgs = {
 
 export type MutationCreateUserArgs = {
   data: UserInput;
+};
+
+
+export type MutationDeleteBrandArgs = {
+  id: Scalars['Int']['input'];
 };
 
 
@@ -127,6 +174,12 @@ export type MutationRemoveRoleFromUserArgs = {
 };
 
 
+export type MutationUpdateBrandArgs = {
+  id: Scalars['Int']['input'];
+  input: BrandUpdateInput;
+};
+
+
 export type MutationUpdateProductArgs = {
   id: Scalars['Int']['input'];
   input: ProductUpdateInput;
@@ -144,10 +197,26 @@ export type MutationUpdateUserArgs = {
   id: Scalars['Int']['input'];
 };
 
+export type PaginatedBrandsResponse = {
+  __typename?: 'PaginatedBrandsResponse';
+  rows: Array<Brand>;
+  total: Scalars['Int']['output'];
+};
+
 export type PaginatedProductsResponse = {
   __typename?: 'PaginatedProductsResponse';
   rows: Array<ProductWithBrand>;
   total: Scalars['Int']['output'];
+};
+
+export type Product = {
+  __typename?: 'Product';
+  brandId: Scalars['Int']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  type: ProductType;
+  updatedAt: Scalars['DateTime']['output'];
 };
 
 export type ProductInput = {
@@ -203,6 +272,12 @@ export type ProductsQueryDto = {
 
 export type Query = {
   __typename?: 'Query';
+  brand: Brand;
+  brandWithProducts: BrandWithProducts;
+  brands: Array<Brand>;
+  brandsByIds: Array<Brand>;
+  brandsByName: Array<Brand>;
+  brandsWithPagination: PaginatedBrandsResponse;
   getProfile: Scalars['String']['output'];
   product: ProductWithBrand;
   products: Array<ProductWithBrand>;
@@ -212,6 +287,31 @@ export type Query = {
   roles?: Maybe<Array<Role>>;
   user?: Maybe<User>;
   users: Array<User>;
+};
+
+
+export type QueryBrandArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
+export type QueryBrandWithProductsArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
+export type QueryBrandsByIdsArgs = {
+  ids: Array<Scalars['Int']['input']>;
+};
+
+
+export type QueryBrandsByNameArgs = {
+  name: Scalars['String']['input'];
+};
+
+
+export type QueryBrandsWithPaginationArgs = {
+  query: BrandsQueryDto;
 };
 
 
@@ -348,6 +448,20 @@ export type LogoutMutationVariables = Exact<{
 
 export type LogoutMutation = { __typename?: 'Mutation', logout: string };
 
+export type GetBrandQueryVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+
+export type GetBrandQuery = { __typename?: 'Query', brand: { __typename?: 'Brand', id: number, name: string, createdAt: string, updatedAt: string } };
+
+export type GetBrandsQueryVariables = Exact<{
+  query: BrandsQueryDto;
+}>;
+
+
+export type GetBrandsQuery = { __typename?: 'Query', brandsWithPagination: { __typename?: 'PaginatedBrandsResponse', total: number, rows: Array<{ __typename?: 'Brand', id: number, name: string, createdAt: string, updatedAt: string }> } };
+
 export type GetProductQueryVariables = Exact<{
   id: Scalars['Int']['input'];
 }>;
@@ -443,6 +557,95 @@ export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<Logou
 export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
 export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
 export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
+export const GetBrandDocument = gql`
+    query GetBrand($id: Int!) {
+  brand(id: $id) {
+    id
+    name
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useGetBrandQuery__
+ *
+ * To run a query within a React component, call `useGetBrandQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBrandQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBrandQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetBrandQuery(baseOptions: Apollo.QueryHookOptions<GetBrandQuery, GetBrandQueryVariables> & ({ variables: GetBrandQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetBrandQuery, GetBrandQueryVariables>(GetBrandDocument, options);
+      }
+export function useGetBrandLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetBrandQuery, GetBrandQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetBrandQuery, GetBrandQueryVariables>(GetBrandDocument, options);
+        }
+export function useGetBrandSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetBrandQuery, GetBrandQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetBrandQuery, GetBrandQueryVariables>(GetBrandDocument, options);
+        }
+export type GetBrandQueryHookResult = ReturnType<typeof useGetBrandQuery>;
+export type GetBrandLazyQueryHookResult = ReturnType<typeof useGetBrandLazyQuery>;
+export type GetBrandSuspenseQueryHookResult = ReturnType<typeof useGetBrandSuspenseQuery>;
+export type GetBrandQueryResult = Apollo.QueryResult<GetBrandQuery, GetBrandQueryVariables>;
+export const GetBrandsDocument = gql`
+    query GetBrands($query: BrandsQueryDto!) {
+  brandsWithPagination(query: $query) {
+    rows {
+      id
+      name
+      createdAt
+      updatedAt
+    }
+    total
+  }
+}
+    `;
+
+/**
+ * __useGetBrandsQuery__
+ *
+ * To run a query within a React component, call `useGetBrandsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBrandsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBrandsQuery({
+ *   variables: {
+ *      query: // value for 'query'
+ *   },
+ * });
+ */
+export function useGetBrandsQuery(baseOptions: Apollo.QueryHookOptions<GetBrandsQuery, GetBrandsQueryVariables> & ({ variables: GetBrandsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetBrandsQuery, GetBrandsQueryVariables>(GetBrandsDocument, options);
+      }
+export function useGetBrandsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetBrandsQuery, GetBrandsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetBrandsQuery, GetBrandsQueryVariables>(GetBrandsDocument, options);
+        }
+export function useGetBrandsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetBrandsQuery, GetBrandsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetBrandsQuery, GetBrandsQueryVariables>(GetBrandsDocument, options);
+        }
+export type GetBrandsQueryHookResult = ReturnType<typeof useGetBrandsQuery>;
+export type GetBrandsLazyQueryHookResult = ReturnType<typeof useGetBrandsLazyQuery>;
+export type GetBrandsSuspenseQueryHookResult = ReturnType<typeof useGetBrandsSuspenseQuery>;
+export type GetBrandsQueryResult = Apollo.QueryResult<GetBrandsQuery, GetBrandsQueryVariables>;
 export const GetProductDocument = gql`
     query GetProduct($id: Int!) {
   product(id: $id) {

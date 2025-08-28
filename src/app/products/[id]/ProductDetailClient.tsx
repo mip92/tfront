@@ -34,7 +34,8 @@ export function ProductDetailClient({
           Product not found
         </h3>
         <p className="text-muted-foreground mb-4">
-          The product you're looking for doesn't exist or has been removed.
+          The product you&apos;re looking for doesn&apos;t exist or has been
+          removed.
         </p>
         <Link href="/products">
           <Button variant="outline">

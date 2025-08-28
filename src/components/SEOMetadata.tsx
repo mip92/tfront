@@ -109,6 +109,20 @@ export const pageSEO = {
       canonical: "/products",
     }),
 
+  brands: () =>
+    generateSEOMetadata({
+      title: "Brands - Brand Catalog & Management",
+      description:
+        "Manage your brand catalog and information with our comprehensive brand management system. Search, filter, and organize your brands efficiently.",
+      keywords: [
+        "brands",
+        "brand catalog",
+        "brand management",
+        "tattoo brands",
+      ],
+      canonical: "/brands",
+    }),
+
   dashboard: () =>
     generateSEOMetadata({
       title: "Dashboard - Business Overview & Analytics",
@@ -149,9 +163,21 @@ export const pageSEO = {
   productDetail: (productId: string) =>
     generateSEOMetadata({
       title: `Product ${productId} - Product Details`,
-      description:
-        `View detailed information about product ${productId}. Product specifications, brand information, and management options.`,
-      keywords: ["product details", "product information", "product management", "tattoo supplies"],
+      description: `View detailed information about product ${productId}. Product specifications, brand information, and management options.`,
+      keywords: [
+        "product details",
+        "product information",
+        "product management",
+        "tattoo supplies",
+      ],
       canonical: `/products/${productId}`,
+    }),
+
+  brandDetail: (brandId: string) =>
+    generateSEOMetadata({
+      title: `Brand ${brandId} - Brand Details`,
+      description: `View detailed information about brand ${brandId}. Brand specifications and management options.`,
+      keywords: ["brand details", "brand information", "brand management"],
+      canonical: `/brands/${brandId}`,
     }),
 };

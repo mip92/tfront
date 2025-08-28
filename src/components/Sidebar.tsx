@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Package,
+  Tag,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -50,6 +51,7 @@ const navigationItems: NavigationItem[] = [
   { href: "/profile", label: "Profile", icon: User, requiresAuth: true },
   { href: "/settings", label: "Settings", icon: Settings, requiresAuth: true },
   { href: "/products", label: "Products", icon: Package, requiresAuth: true },
+  { href: "/brands", label: "Brands", icon: Tag, requiresAuth: true },
 ];
 
 export default function Sidebar({
