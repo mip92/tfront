@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Search, Filter, Package, Loader2 } from "lucide-react";
 import { AsyncGenericList } from "@/components/AsyncGenericList";
 import { ProductSkeleton } from "@/components/ProductSkeleton";
+import Link from "next/link";
 import {
   useProductsInfinite,
   type ProductFromQuery,
@@ -53,9 +54,11 @@ export function ProductsClient() {
             <Button variant="outline" size="sm" className="flex-1">
               Edit
             </Button>
-            <Button variant="outline" size="sm" className="flex-1">
-              View
-            </Button>
+            <Link href={`/products/${product.id}`}>
+              <Button variant="outline" size="sm" className="flex-1">
+                View
+              </Button>
+            </Link>
           </div>
         </CardContent>
       </Card>
@@ -80,7 +83,7 @@ export function ProductsClient() {
   return (
     <>
       {/* Actions Bar */}
-      <section className="mb-6 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+      <section className="mb-6 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between px-2">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -106,7 +109,7 @@ export function ProductsClient() {
 
       {/* Loading State */}
       {loading && productsData.rows.length === 0 && (
-        <section className="flex items-center justify-center py-12">
+        <section className="flex items-center justify-center py-12 px-2">
           <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
           <span className="ml-2 text-muted-foreground">
             Loading products...
@@ -116,7 +119,7 @@ export function ProductsClient() {
 
       {/* Products List */}
       {productsData.rows.length > 0 && (
-        <section>
+        <section className="px-2">
           <p className="text-muted-foreground mb-4">
             Total products: {productsData.total}
           </p>
@@ -129,9 +132,9 @@ export function ProductsClient() {
             isLoading={loadingMore}
             gridCols={{
               xs: 1,
-              sm: 2,
-              md: 3,
-              lg: 4,
+              sm: 1,
+              md: 2,
+              lg: 3,
               xl: 4,
             }}
             spacing={6}
@@ -140,7 +143,7 @@ export function ProductsClient() {
       )}
 
       {!loading && productsData.rows.length === 0 && (
-        <section className="text-center py-12">
+        <section className="text-center py-12 px-2">
           <Package className="h-16 w-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
             No products found

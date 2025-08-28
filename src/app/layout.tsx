@@ -53,22 +53,12 @@ export const metadata: Metadata = {
     description:
       "A modern Next.js application for tattoo business management with GraphQL authentication, product catalog, and inventory management.",
     siteName: "Tattoo Client",
-    images: [
-      {
-        url: "/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Tattoo Client - Business Management Platform",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Tattoo Client - Modern Tattoo Business Management",
     description:
       "A modern Next.js application for tattoo business management with GraphQL authentication, product catalog, and inventory management.",
-    images: ["/og-image.jpg"],
-    creator: "@tattooclient",
   },
   robots: {
     index: true,

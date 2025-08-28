@@ -206,8 +206,6 @@ export type Query = {
   getProfile: Scalars['String']['output'];
   product: ProductWithBrand;
   products: Array<ProductWithBrand>;
-  productsByBrand: Array<ProductWithBrand>;
-  productsByType: Array<ProductWithBrand>;
   productsWithPagination: PaginatedProductsResponse;
   role?: Maybe<Role>;
   roleByName?: Maybe<Role>;
@@ -219,16 +217,6 @@ export type Query = {
 
 export type QueryProductArgs = {
   id: Scalars['Int']['input'];
-};
-
-
-export type QueryProductsByBrandArgs = {
-  brandId: Scalars['Int']['input'];
-};
-
-
-export type QueryProductsByTypeArgs = {
-  type: ProductType;
 };
 
 
@@ -360,6 +348,13 @@ export type LogoutMutationVariables = Exact<{
 
 export type LogoutMutation = { __typename?: 'Mutation', logout: string };
 
+export type GetProductQueryVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+
+export type GetProductQuery = { __typename?: 'Query', product: { __typename?: 'ProductWithBrand', id: number, name: string, brandId: number, createdAt: string, type: ProductType, updatedAt: string, brand: { __typename?: 'Brand', id: number, name: string } } };
+
 export type GetProductsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -448,6 +443,55 @@ export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<Logou
 export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
 export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
 export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
+export const GetProductDocument = gql`
+    query GetProduct($id: Int!) {
+  product(id: $id) {
+    id
+    name
+    brandId
+    createdAt
+    type
+    updatedAt
+    brand {
+      id
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetProductQuery__
+ *
+ * To run a query within a React component, call `useGetProductQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetProductQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetProductQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetProductQuery(baseOptions: Apollo.QueryHookOptions<GetProductQuery, GetProductQueryVariables> & ({ variables: GetProductQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetProductQuery, GetProductQueryVariables>(GetProductDocument, options);
+      }
+export function useGetProductLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetProductQuery, GetProductQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetProductQuery, GetProductQueryVariables>(GetProductDocument, options);
+        }
+export function useGetProductSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetProductQuery, GetProductQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetProductQuery, GetProductQueryVariables>(GetProductDocument, options);
+        }
+export type GetProductQueryHookResult = ReturnType<typeof useGetProductQuery>;
+export type GetProductLazyQueryHookResult = ReturnType<typeof useGetProductLazyQuery>;
+export type GetProductSuspenseQueryHookResult = ReturnType<typeof useGetProductSuspenseQuery>;
+export type GetProductQueryResult = Apollo.QueryResult<GetProductQuery, GetProductQueryVariables>;
 export const GetProductsDocument = gql`
     query GetProducts {
   products {
