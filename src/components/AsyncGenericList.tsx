@@ -47,22 +47,41 @@ export const AsyncGenericList = <T,>({
 }: AsyncGenericListProps<T>) => {
   const [hasMore, setHasMore] = useState(true);
 
-  // Reset hasMore when items change (e.g., new search)
   useEffect(() => {
     setHasMore(true);
   }, [items.rows.length]);
 
   const handleLoadMore = useCallback(async () => {
+    console.log(
+      "handleLoadMore called, isLoading:",
+      isLoading,
+      "hasMore:",
+      hasMore,
+      "current items:",
+      items.rows.length,
+      "total:",
+      items.total
+    );
     if (isLoading || !hasMore) return;
 
+    if (items.rows.length >= items.total) {
+      console.log("Already have all items, setting hasMore to false");
+      setHasMore(false);
+      return;
+    }
+
     try {
-      const response = await loadMore(items.rows.length, take);
+      const currentSkip = items.rows.length;
+      console.log("Calling loadMore with skip:", currentSkip, "take:", take);
+      const response = await loadMore(currentSkip, take);
       const { rows: newItems, total } = response;
-      if (
-        newItems.length === 0 ||
-        items.rows.length + newItems.length >= total
-      ) {
+      console.log("LoadMore response:", { newItems: newItems.length, total });
+
+      if (newItems.length === 0 || currentSkip + newItems.length >= total) {
+        console.log("No more items to load, setting hasMore to false");
         setHasMore(false);
+      } else {
+        console.log("More items available, hasMore remains true");
       }
     } catch (error) {
       console.error("Error loading more items:", error);

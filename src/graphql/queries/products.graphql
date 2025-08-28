@@ -1,17 +1,3 @@
-query GetProducts {
-  products {
-    id
-    name
-    brand {
-      name
-    }
-    brandId
-    createdAt
-    type
-    updatedAt
-  }
-}
-
 query GetProductsWithPagination($query: ProductsQueryDto!) {
   productsWithPagination(query: $query) {
     rows {

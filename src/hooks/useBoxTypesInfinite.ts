@@ -1,10 +1,12 @@
 import { useCallback, useMemo, useState } from "react";
-import { useGetBrandsQuery } from "@/generated/graphql";
+import { useGetBoxTypesQuery } from "@/generated/graphql";
 
-export type BrandFromQuery = {
-  __typename?: "Brand";
+export type BoxTypeFromQuery = {
+  __typename?: "BoxType";
   id: number;
   name: string;
+  quantity: number;
+  type: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -14,12 +16,12 @@ export interface PaginationOutResponse<T> {
   total: number;
 }
 
-const take = 2;
+const take = 5;
 
-export function useBrandsInfinite(searchTerm: string) {
+export function useBoxTypesInfinite(searchTerm: string) {
   const [loadingMore, setLoadingMore] = useState(false);
 
-  const { loading, error, data, fetchMore, refetch } = useGetBrandsQuery({
+  const { loading, error, data, fetchMore, refetch } = useGetBoxTypesQuery({
     variables: {
       query: {
         skip: 0,
@@ -30,12 +32,12 @@ export function useBrandsInfinite(searchTerm: string) {
     fetchPolicy: "cache-and-network",
   });
 
-  const brandsData = useMemo(() => {
-    console.log("Brands data:", data);
-    if (data?.brandsWithPagination) {
+  const boxTypesData = useMemo(() => {
+    console.log("Box types data:", data);
+    if (data?.boxTypesWithPagination) {
       return {
-        rows: data.brandsWithPagination.rows.filter(Boolean),
-        total: data.brandsWithPagination.total || 0,
+        rows: data.boxTypesWithPagination.rows.filter(Boolean),
+        total: data.boxTypesWithPagination.total || 0,
       };
     }
     return { rows: [], total: 0 };
@@ -45,8 +47,7 @@ export function useBrandsInfinite(searchTerm: string) {
     async (
       skip: number,
       take: number
-    ): Promise<PaginationOutResponse<BrandFromQuery>> => {
-      console.log("Loading more brands, skip:", skip, "take:", take);
+    ): Promise<PaginationOutResponse<BoxTypeFromQuery>> => {
       setLoadingMore(true);
 
       try {
@@ -60,15 +61,12 @@ export function useBrandsInfinite(searchTerm: string) {
           },
         });
 
-        console.log("FetchMore result:", result);
-
-        if (result.data?.brandsWithPagination?.rows) {
-          const newBrands =
-            result.data.brandsWithPagination.rows.filter(Boolean);
-          console.log("New brands loaded:", newBrands.length);
+        if (result.data?.boxTypesWithPagination?.rows) {
+          const newBoxTypes =
+            result.data.boxTypesWithPagination.rows.filter(Boolean);
           return {
-            rows: newBrands,
-            total: result.data.brandsWithPagination.total || 0,
+            rows: newBoxTypes,
+            total: result.data.boxTypesWithPagination.total || 0,
           };
         }
 
@@ -76,8 +74,7 @@ export function useBrandsInfinite(searchTerm: string) {
           rows: [],
           total: 0,
         };
-      } catch (error) {
-        console.error("Error loading more brands:", error);
+      } catch {
         return {
           rows: [],
           total: 0,
@@ -90,7 +87,7 @@ export function useBrandsInfinite(searchTerm: string) {
   );
 
   return {
-    brandsData,
+    boxTypesData,
     loadMore,
     loading,
     loadingMore,

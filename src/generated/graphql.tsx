@@ -25,6 +25,58 @@ export type AuthResponse = {
   user: UserAuth;
 };
 
+export type Box = {
+  __typename?: 'Box';
+  boxTypeId?: Maybe<Scalars['Int']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['Int']['output'];
+  name?: Maybe<Scalars['String']['output']>;
+  parentBoxId?: Maybe<Scalars['Int']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type BoxType = {
+  __typename?: 'BoxType';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  quantity: Scalars['Int']['output'];
+  type: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type BoxTypeInput = {
+  name: Scalars['String']['input'];
+  quantity?: Scalars['Int']['input'];
+  type: Scalars['String']['input'];
+};
+
+/** Поле для сортировки типов коробок */
+export enum BoxTypeSortField {
+  CreatedAt = 'CREATED_AT',
+  Id = 'ID',
+  Name = 'NAME',
+  Quantity = 'QUANTITY',
+  Type = 'TYPE',
+  UpdatedAt = 'UPDATED_AT'
+}
+
+export type BoxTypeUpdateInput = {
+  name?: InputMaybe<Scalars['String']['input']>;
+  quantity?: InputMaybe<Scalars['Int']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type BoxTypesQueryDto = {
+  ids?: InputMaybe<Array<Scalars['Int']['input']>>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  sortBy?: InputMaybe<BoxTypeSortField>;
+  sortOrder?: InputMaybe<SortOrder>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type Brand = {
   __typename?: 'Brand';
   createdAt: Scalars['DateTime']['output'];
@@ -67,10 +119,12 @@ export type Mutation = {
   __typename?: 'Mutation';
   assignRole: User;
   assignRoleToUser: Role;
+  createBoxType: BoxType;
   createBrand: Brand;
   createProduct: ProductWithBrand;
   createRole: Role;
   createUser: User;
+  deleteBoxType: BoxType;
   deleteBrand: Brand;
   deleteProduct: ProductWithBrand;
   deleteRole: Role;
@@ -80,6 +134,7 @@ export type Mutation = {
   refreshToken: AuthResponse;
   removeRole: User;
   removeRoleFromUser: Role;
+  updateBoxType: BoxType;
   updateBrand: Brand;
   updateProduct: ProductWithBrand;
   updateRole: Role;
@@ -96,6 +151,11 @@ export type MutationAssignRoleArgs = {
 export type MutationAssignRoleToUserArgs = {
   roleId: Scalars['Int']['input'];
   userId: Scalars['Int']['input'];
+};
+
+
+export type MutationCreateBoxTypeArgs = {
+  input: BoxTypeInput;
 };
 
 
@@ -116,6 +176,11 @@ export type MutationCreateRoleArgs = {
 
 export type MutationCreateUserArgs = {
   data: UserInput;
+};
+
+
+export type MutationDeleteBoxTypeArgs = {
+  id: Scalars['Int']['input'];
 };
 
 
@@ -165,6 +230,12 @@ export type MutationRemoveRoleFromUserArgs = {
 };
 
 
+export type MutationUpdateBoxTypeArgs = {
+  id: Scalars['Int']['input'];
+  input: BoxTypeUpdateInput;
+};
+
+
 export type MutationUpdateBrandArgs = {
   id: Scalars['Int']['input'];
   input: BrandUpdateInput;
@@ -186,6 +257,12 @@ export type MutationUpdateRoleArgs = {
 export type MutationUpdateUserArgs = {
   data: UserUpdateInput;
   id: Scalars['Int']['input'];
+};
+
+export type PaginatedBoxTypesResponse = {
+  __typename?: 'PaginatedBoxTypesResponse';
+  rows: Array<BoxType>;
+  total: Scalars['Float']['output'];
 };
 
 export type PaginatedBrandsResponse = {
@@ -263,9 +340,9 @@ export type ProductsQueryDto = {
 
 export type Query = {
   __typename?: 'Query';
+  boxType: BoxType;
+  boxTypesWithPagination: PaginatedBoxTypesResponse;
   brand: Brand;
-  brands: Array<Brand>;
-  brandsByIds: Array<Brand>;
   brandsWithPagination: PaginatedBrandsResponse;
   getProfile: Scalars['String']['output'];
   product: ProductWithBrand;
@@ -279,13 +356,18 @@ export type Query = {
 };
 
 
-export type QueryBrandArgs = {
+export type QueryBoxTypeArgs = {
   id: Scalars['Int']['input'];
 };
 
 
-export type QueryBrandsByIdsArgs = {
-  ids: Array<Scalars['Int']['input']>;
+export type QueryBoxTypesWithPaginationArgs = {
+  query: BoxTypesQueryDto;
+};
+
+
+export type QueryBrandArgs = {
+  id: Scalars['Int']['input'];
 };
 
 
@@ -427,6 +509,20 @@ export type LogoutMutationVariables = Exact<{
 
 export type LogoutMutation = { __typename?: 'Mutation', logout: string };
 
+export type GetBoxTypeQueryVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+
+export type GetBoxTypeQuery = { __typename?: 'Query', boxType: { __typename?: 'BoxType', id: number, name: string, quantity: number, type: string, createdAt: string, updatedAt: string } };
+
+export type GetBoxTypesQueryVariables = Exact<{
+  query: BoxTypesQueryDto;
+}>;
+
+
+export type GetBoxTypesQuery = { __typename?: 'Query', boxTypesWithPagination: { __typename?: 'PaginatedBoxTypesResponse', total: number, rows: Array<{ __typename?: 'BoxType', id: number, name: string, quantity: number, type: string, createdAt: string, updatedAt: string }> } };
+
 export type GetBrandQueryVariables = Exact<{
   id: Scalars['Int']['input'];
 }>;
@@ -447,11 +543,6 @@ export type GetProductQueryVariables = Exact<{
 
 
 export type GetProductQuery = { __typename?: 'Query', product: { __typename?: 'ProductWithBrand', id: number, name: string, brandId: number, createdAt: string, type: ProductType, updatedAt: string, brand: { __typename?: 'Brand', id: number, name: string } } };
-
-export type GetProductsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetProductsQuery = { __typename?: 'Query', products: Array<{ __typename?: 'ProductWithBrand', id: number, name: string, brandId: number, createdAt: string, type: ProductType, updatedAt: string, brand: { __typename?: 'Brand', name: string } }> };
 
 export type GetProductsWithPaginationQueryVariables = Exact<{
   query: ProductsQueryDto;
@@ -536,6 +627,99 @@ export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<Logou
 export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
 export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
 export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
+export const GetBoxTypeDocument = gql`
+    query GetBoxType($id: Int!) {
+  boxType(id: $id) {
+    id
+    name
+    quantity
+    type
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useGetBoxTypeQuery__
+ *
+ * To run a query within a React component, call `useGetBoxTypeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBoxTypeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBoxTypeQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetBoxTypeQuery(baseOptions: Apollo.QueryHookOptions<GetBoxTypeQuery, GetBoxTypeQueryVariables> & ({ variables: GetBoxTypeQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetBoxTypeQuery, GetBoxTypeQueryVariables>(GetBoxTypeDocument, options);
+      }
+export function useGetBoxTypeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetBoxTypeQuery, GetBoxTypeQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetBoxTypeQuery, GetBoxTypeQueryVariables>(GetBoxTypeDocument, options);
+        }
+export function useGetBoxTypeSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetBoxTypeQuery, GetBoxTypeQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetBoxTypeQuery, GetBoxTypeQueryVariables>(GetBoxTypeDocument, options);
+        }
+export type GetBoxTypeQueryHookResult = ReturnType<typeof useGetBoxTypeQuery>;
+export type GetBoxTypeLazyQueryHookResult = ReturnType<typeof useGetBoxTypeLazyQuery>;
+export type GetBoxTypeSuspenseQueryHookResult = ReturnType<typeof useGetBoxTypeSuspenseQuery>;
+export type GetBoxTypeQueryResult = Apollo.QueryResult<GetBoxTypeQuery, GetBoxTypeQueryVariables>;
+export const GetBoxTypesDocument = gql`
+    query GetBoxTypes($query: BoxTypesQueryDto!) {
+  boxTypesWithPagination(query: $query) {
+    rows {
+      id
+      name
+      quantity
+      type
+      createdAt
+      updatedAt
+    }
+    total
+  }
+}
+    `;
+
+/**
+ * __useGetBoxTypesQuery__
+ *
+ * To run a query within a React component, call `useGetBoxTypesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBoxTypesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBoxTypesQuery({
+ *   variables: {
+ *      query: // value for 'query'
+ *   },
+ * });
+ */
+export function useGetBoxTypesQuery(baseOptions: Apollo.QueryHookOptions<GetBoxTypesQuery, GetBoxTypesQueryVariables> & ({ variables: GetBoxTypesQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetBoxTypesQuery, GetBoxTypesQueryVariables>(GetBoxTypesDocument, options);
+      }
+export function useGetBoxTypesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetBoxTypesQuery, GetBoxTypesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetBoxTypesQuery, GetBoxTypesQueryVariables>(GetBoxTypesDocument, options);
+        }
+export function useGetBoxTypesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetBoxTypesQuery, GetBoxTypesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetBoxTypesQuery, GetBoxTypesQueryVariables>(GetBoxTypesDocument, options);
+        }
+export type GetBoxTypesQueryHookResult = ReturnType<typeof useGetBoxTypesQuery>;
+export type GetBoxTypesLazyQueryHookResult = ReturnType<typeof useGetBoxTypesLazyQuery>;
+export type GetBoxTypesSuspenseQueryHookResult = ReturnType<typeof useGetBoxTypesSuspenseQuery>;
+export type GetBoxTypesQueryResult = Apollo.QueryResult<GetBoxTypesQuery, GetBoxTypesQueryVariables>;
 export const GetBrandDocument = gql`
     query GetBrand($id: Int!) {
   brand(id: $id) {
@@ -674,53 +858,6 @@ export type GetProductQueryHookResult = ReturnType<typeof useGetProductQuery>;
 export type GetProductLazyQueryHookResult = ReturnType<typeof useGetProductLazyQuery>;
 export type GetProductSuspenseQueryHookResult = ReturnType<typeof useGetProductSuspenseQuery>;
 export type GetProductQueryResult = Apollo.QueryResult<GetProductQuery, GetProductQueryVariables>;
-export const GetProductsDocument = gql`
-    query GetProducts {
-  products {
-    id
-    name
-    brand {
-      name
-    }
-    brandId
-    createdAt
-    type
-    updatedAt
-  }
-}
-    `;
-
-/**
- * __useGetProductsQuery__
- *
- * To run a query within a React component, call `useGetProductsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetProductsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetProductsQuery({
- *   variables: {
- *   },
- * });
- */
-export function useGetProductsQuery(baseOptions?: Apollo.QueryHookOptions<GetProductsQuery, GetProductsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetProductsQuery, GetProductsQueryVariables>(GetProductsDocument, options);
-      }
-export function useGetProductsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetProductsQuery, GetProductsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetProductsQuery, GetProductsQueryVariables>(GetProductsDocument, options);
-        }
-export function useGetProductsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetProductsQuery, GetProductsQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetProductsQuery, GetProductsQueryVariables>(GetProductsDocument, options);
-        }
-export type GetProductsQueryHookResult = ReturnType<typeof useGetProductsQuery>;
-export type GetProductsLazyQueryHookResult = ReturnType<typeof useGetProductsLazyQuery>;
-export type GetProductsSuspenseQueryHookResult = ReturnType<typeof useGetProductsSuspenseQuery>;
-export type GetProductsQueryResult = Apollo.QueryResult<GetProductsQuery, GetProductsQueryVariables>;
 export const GetProductsWithPaginationDocument = gql`
     query GetProductsWithPagination($query: ProductsQueryDto!) {
   productsWithPagination(query: $query) {

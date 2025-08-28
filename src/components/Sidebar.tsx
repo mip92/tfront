@@ -52,6 +52,7 @@ const navigationItems: NavigationItem[] = [
   { href: "/settings", label: "Settings", icon: Settings, requiresAuth: true },
   { href: "/products", label: "Products", icon: Package, requiresAuth: true },
   { href: "/brands", label: "Brands", icon: Tag, requiresAuth: true },
+  { href: "/box-types", label: "Box Types", icon: Package, requiresAuth: true },
 ];
 
 export default function Sidebar({

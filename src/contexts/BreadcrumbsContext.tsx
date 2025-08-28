@@ -30,7 +30,6 @@ export function BreadcrumbsProvider({ children }: { children: ReactNode }) {
   ]);
 
   const setBreadcrumbs = useCallback((newBreadcrumbs: BreadcrumbItem[]) => {
-    // Если это главная страница (пустой массив или только Home), показываем только Home
     if (
       newBreadcrumbs.length === 0 ||
       (newBreadcrumbs.length === 1 &&
@@ -39,7 +38,6 @@ export function BreadcrumbsProvider({ children }: { children: ReactNode }) {
     ) {
       setBreadcrumbsState([{ label: "Home", href: "/", isActive: true }]);
     } else {
-      // Для других страниц добавляем Home в начало
       const homeBreadcrumb = { label: "Home", href: "/", isActive: false };
       setBreadcrumbsState([homeBreadcrumb, ...newBreadcrumbs]);
     }

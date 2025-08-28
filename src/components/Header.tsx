@@ -57,6 +57,12 @@ export default function Header({
                 >
                   Products
                 </Link>
+                <Link
+                  href="/box-types"
+                  className="transition-colors hover:text-blue-600 text-gray-700 dark:text-gray-300"
+                >
+                  Box Types
+                </Link>
                 {user?.role?.name === "admin" && (
                   <Link
                     href="/admin"

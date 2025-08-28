@@ -123,6 +123,20 @@ export const pageSEO = {
       canonical: "/brands",
     }),
 
+  boxTypes: () =>
+    generateSEOMetadata({
+      title: "Box Types - Box Type Catalog & Management",
+      description:
+        "Manage your box type catalog and information with our comprehensive box type management system. Search, filter, and organize your box types efficiently.",
+      keywords: [
+        "box types",
+        "box type catalog",
+        "box type management",
+        "tattoo supplies",
+      ],
+      canonical: "/box-types",
+    }),
+
   dashboard: () =>
     generateSEOMetadata({
       title: "Dashboard - Business Overview & Analytics",
@@ -179,5 +193,18 @@ export const pageSEO = {
       description: `View detailed information about brand ${brandId}. Brand specifications and management options.`,
       keywords: ["brand details", "brand information", "brand management"],
       canonical: `/brands/${brandId}`,
+    }),
+
+  boxType: () =>
+    generateSEOMetadata({
+      title: "Box Type - Box Type Details",
+      description:
+        "View detailed information about box type. Box type specifications and management options.",
+      keywords: [
+        "box type details",
+        "box type information",
+        "box type management",
+      ],
+      canonical: "/box-types",
     }),
 };

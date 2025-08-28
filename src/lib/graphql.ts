@@ -20,7 +20,6 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
-// Apollo Client
 export const client = new ApolloClient({
   link: authLink.concat(httpLink),
   cache: new InMemoryCache({
@@ -28,28 +27,54 @@ export const client = new ApolloClient({
       Query: {
         fields: {
           productsWithPagination: {
-            // Учитываем поиск в ключе кэша, чтобы разные поиски не смешивались
             keyArgs: ["query", ["search"]],
-            // Автоматически мержим новые данные с существующими
-            merge(existing = { rows: [], total: 0 }, incoming) {
-              // Если это первый запрос (skip: 0), возвращаем как есть
-              if (incoming.rows.length > 0 && existing.rows.length === 0) {
-                return incoming;
-              }
-
-              // Если это подгрузка (fetchMore), добавляем новые элементы к существующим
-              return {
-                total: incoming.total,
-                rows: [...existing.rows, ...incoming.rows],
-              };
-            },
+            merge: createPaginationMergeFunction("products"),
+          },
+          brandsWithPagination: {
+            keyArgs: ["query", ["search"]],
+            merge: createPaginationMergeFunction("brands"),
+          },
+          boxTypesWithPagination: {
+            keyArgs: ["query", ["search"]],
+            merge: createPaginationMergeFunction("box types"),
           },
         },
       },
     },
   }),
-  ssrMode: typeof window === "undefined", // Enable SSR mode on server
+  ssrMode: typeof window === "undefined",
 });
+
+interface PaginationData {
+  rows: unknown[];
+  total: number;
+}
+
+function createPaginationMergeFunction(type: string) {
+  return (
+    existing: PaginationData = { rows: [], total: 0 },
+    incoming: PaginationData
+  ) => {
+    console.log(`Apollo cache merge for ${type}:`, { existing, incoming });
+
+    if (incoming.rows.length > 0 && existing.rows.length === 0) {
+      console.log(`First request for ${type}, returning incoming data`);
+      return incoming;
+    }
+
+    if (existing.rows.length >= incoming.total) {
+      console.log(`Already have all data for ${type}, returning existing`);
+      return existing;
+    }
+
+    const merged = {
+      total: incoming.total,
+      rows: [...existing.rows, ...incoming.rows],
+    };
+    console.log(`Merged data for ${type}:`, merged);
+    return merged;
+  };
+}
 
 // Auth types
 export interface User {
