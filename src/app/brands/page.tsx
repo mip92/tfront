@@ -28,14 +28,6 @@ export default function BrandsPage() {
     <div className="min-h-screen bg-muted/50">
       <main className="w-full py-6">
         <div className="w-full px-6">
-          {/* Семантический заголовок страницы */}
-          <header className="mb-4">
-            <h1 className="text-3xl font-bold text-foreground">Brands</h1>
-            <p className="text-muted-foreground mt-2">
-              Manage your brand catalog and information
-            </p>
-          </header>
-
           {/* Клиентский компонент для интерактивности */}
           <BrandsClient />
         </div>

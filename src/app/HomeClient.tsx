@@ -1,27 +1,18 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useBreadcrumbs } from "@/contexts/BreadcrumbsContext";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useSetBreadcrumbs } from "@/hooks/useSetBreadcrumbs";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
 export default function HomeClient() {
   const { isAuthenticated, user } = useAuth();
+  const { clearBreadcrumbs } = useBreadcrumbs();
 
-  const breadcrumbItems = useMemo(
-    () => [{ label: "Home", href: "/", isActive: true }],
-    []
-  );
-
-  useSetBreadcrumbs(breadcrumbItems);
+  useEffect(() => {
+    clearBreadcrumbs();
+  }, [clearBreadcrumbs]);
 
   return (
     <>

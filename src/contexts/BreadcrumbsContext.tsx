@@ -30,8 +30,19 @@ export function BreadcrumbsProvider({ children }: { children: ReactNode }) {
   ]);
 
   const setBreadcrumbs = useCallback((newBreadcrumbs: BreadcrumbItem[]) => {
-    const homeBreadcrumb = { label: "Home", href: "/", isActive: false };
-    setBreadcrumbsState([homeBreadcrumb, ...newBreadcrumbs]);
+    // Если это главная страница (пустой массив или только Home), показываем только Home
+    if (
+      newBreadcrumbs.length === 0 ||
+      (newBreadcrumbs.length === 1 &&
+        newBreadcrumbs[0].label === "Home" &&
+        newBreadcrumbs[0].href === "/")
+    ) {
+      setBreadcrumbsState([{ label: "Home", href: "/", isActive: true }]);
+    } else {
+      // Для других страниц добавляем Home в начало
+      const homeBreadcrumb = { label: "Home", href: "/", isActive: false };
+      setBreadcrumbsState([homeBreadcrumb, ...newBreadcrumbs]);
+    }
   }, []);
 
   const clearBreadcrumbs = useCallback(() => {

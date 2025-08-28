@@ -3,8 +3,7 @@
 import React, { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Package, ArrowLeft, Edit, Trash2 } from "lucide-react";
-import Link from "next/link";
+import { Package, Edit, Trash2 } from "lucide-react";
 import { useSetBreadcrumbs } from "@/hooks/useSetBreadcrumbs";
 
 interface ProductData {
@@ -54,36 +53,12 @@ export function ProductDetailClient({
           The product you&apos;re looking for doesn&apos;t exist or has been
           removed.
         </p>
-        <Link href="/products">
-          <Button variant="outline">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Products
-          </Button>
-        </Link>
       </div>
     );
   }
 
   return (
     <>
-      {/* Header with back button */}
-      <header className="mb-6">
-        <div className="flex items-center gap-4 mb-4">
-          <Link href="/products">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Products
-            </Button>
-          </Link>
-        </div>
-        <h1 className="text-3xl font-bold text-foreground">
-          {productData.name}
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          Product ID: {productData.id} | Brand: {productData.brand.name}
-        </p>
-      </header>
-
       {/* Product Details */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Product Image */}

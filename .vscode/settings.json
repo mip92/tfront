@@ -1,0 +1,14 @@
+{
+  "audioCues.enabled": "off",
+  "workbench.sound.enabled": false,
+  "workbench.sound.volume": 0,
+  "workbench.settings.enableNaturalLanguageSearch": false,
+  "editor.quickSuggestions": {
+    "other": false,
+    "comments": false,
+    "strings": false
+  },
+  "editor.suggest.showStatusBar": false,
+  "workbench.statusBar.visible": true,
+  "accessibility.signalOptions.volume": 0
+}

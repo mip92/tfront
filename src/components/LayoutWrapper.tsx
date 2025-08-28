@@ -63,6 +63,15 @@ export default function LayoutWrapper({
                   ))}
                 </BreadcrumbList>
               </Breadcrumb>
+
+              {/* Page Title */}
+              {breadcrumbs.length > 0 && (
+                <div className="mt-4">
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {breadcrumbs[breadcrumbs.length - 1].label}
+                  </h1>
+                </div>
+              )}
             </div>
           )}
 

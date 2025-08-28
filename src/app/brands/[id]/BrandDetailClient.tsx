@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Edit, Tag, Calendar, Hash, Loader2 } from "lucide-react";
-import Link from "next/link";
+import { Edit, Tag, Calendar, Hash, Loader2 } from "lucide-react";
 import { useBrand } from "@/hooks/useBrand";
 import { useSetBreadcrumbs } from "@/hooks/useSetBreadcrumbs";
 
@@ -59,24 +58,13 @@ export function BrandDetailClient({ brandId }: { brandId: string }) {
 
   return (
     <div className="space-y-6">
-      {/* Navigation */}
-      <div className="flex items-center gap-4">
-        <Link href="/brands">
-          <Button variant="outline" size="sm">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Brands
-          </Button>
-        </Link>
-      </div>
-
       {/* Brand Information */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-2xl flex items-center gap-3">
+            <div className="flex items-center gap-3">
               <Tag className="h-8 w-8 text-blue-600" />
-              {brandData.name}
-            </CardTitle>
+            </div>
             <Button size="sm">
               <Edit className="h-4 w-4 mr-2" />
               Edit Brand
