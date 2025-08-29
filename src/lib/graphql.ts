@@ -7,6 +7,7 @@ const httpLink = createHttpLink({
 });
 
 // Auth link to add token to headers
+
 const authLink = setContext((_, { headers }) => {
   let token = null;
   if (typeof window !== "undefined") {
