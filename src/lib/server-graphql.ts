@@ -1,9 +1,9 @@
 import { GetProductQuery, GetProductQueryVariables } from "@/generated/graphql";
 
 // Функция для серверных GraphQL запросов
-export async function serverQuery<T = any>(
+export async function serverQuery<T = unknown>(
   query: string,
-  variables?: Record<string, any>
+  variables?: Record<string, unknown>
 ): Promise<T> {
   try {
     const response = await fetch(
