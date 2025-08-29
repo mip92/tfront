@@ -73,7 +73,7 @@ jobs:
       - name: Checkout tattoo-nginx repository
         uses: actions/checkout@v4
         with:
-          repository: mip92/tattoo-nginx
+          repository: mip92/tattoo
           token: ${{ secrets.PAT_TOKEN }}
           path: tattoo-nginx
 
