@@ -11,5 +11,5 @@ export function AdminBreadcrumbs() {
 
   useSetBreadcrumbs(breadcrumbItems);
 
-  return null; // This component only sets breadcrumbs, doesn't render anything
+  return null; // This component only sets breadcrumbs, doesn't render anythingdd
 }
