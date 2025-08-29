@@ -31,8 +31,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check GraphQL server availability
+        run: |
+          echo "Checking GraphQL server availability..."
+          curl -f ${{ secrets.GRAPHQL_SERVER_URL }} || echo "Server not available, using fallback"
+
       - name: Generate GraphQL types
-        run: npm run codegen
+        run: |
+          export NEXT_PUBLIC_SERVER_URL=${{ secrets.GRAPHQL_SERVER_URL }}
+          npm run codegen
 
       - name: Build Next.js application
         run: npm run build:docker

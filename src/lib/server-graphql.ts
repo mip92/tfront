@@ -7,7 +7,7 @@ export async function serverQuery<T = unknown>(
 ): Promise<T> {
   try {
     const response = await fetch(
-      process.env.NEXT_PUBLIC_GRAPHQL_URL || "http://localhost:4000/graphql",
+      process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:4000/graphql",
       {
         method: "POST",
         headers: {
