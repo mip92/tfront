@@ -19,7 +19,7 @@ RUN npm ci --only=production --no-audit --no-fund --prefer-offline --no-optional
 # Копируем собранное приложение с локалки
 COPY .next ./.next
 COPY public ./public
-COPY next.config.ts ./
+COPY next.config.js ./
 
 # Ограничиваем память для Node.js
 ENV NODE_OPTIONS="--max-old-space-size=128"

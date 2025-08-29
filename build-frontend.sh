@@ -12,7 +12,7 @@ else
     TAG="latest"
 fi
 
-echo "🚀 Собираю frontend Docker образ и пушу в registry..."
+echo "🚀 Собираю frontend Docker образ для локальной разработки..."
 
 # Проверяем, что мы в правильной директории
 if [ ! -f "Dockerfile" ]; then
@@ -31,8 +31,8 @@ fi
 
 echo "✅ Приложение успешно собрано локально!"
 
-# Собираем frontend образ для Ubuntu
-echo "🔨 Собираю frontend Docker образ для Ubuntu..."
+# Собираем frontend образ для локального использования
+echo "🔨 Собираю frontend Docker образ локально..."
 docker build -t ${USERNAME}/${IMAGE_NAME}:${TAG} .
 
 if [ $? -ne 0 ]; then
@@ -40,16 +40,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Пушим образ в Docker Hub
-echo "🚀 Пушим образ в Docker Hub..."
-docker push ${USERNAME}/${IMAGE_NAME}:${TAG}
-
-if [ $? -ne 0 ]; then
-    echo "❌ Ошибка сборки образа!"
-    exit 1
-fi
-
-echo "✅ Frontend образ успешно собран и запушен в Docker Hub!"
-echo "🐳 Теперь на сервере выполните:"
-echo "   docker pull ${USERNAME}/${IMAGE_NAME}:${TAG}"
-echo "   docker-compose -f docker-compose.prod.yml up -d"
+echo "✅ Frontend образ успешно собран локально!"
+echo "🐳 Для production используйте GitHub Actions workflow"
+echo "📝 Для локального тестирования: docker run -p 3000:3000 ${USERNAME}/${IMAGE_NAME}:${TAG}"
