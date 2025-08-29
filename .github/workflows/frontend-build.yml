@@ -31,11 +31,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Check GraphQL server availability
-        run: |
-          echo "Checking GraphQL server availability..."
-          curl -f ${{ secrets.GRAPHQL_SERVER_URL }} || echo "Server not available, using fallback"
-
       - name: Generate GraphQL types
         run: |
           export NEXT_PUBLIC_SERVER_URL=${{ secrets.GRAPHQL_SERVER_URL }}
@@ -68,3 +63,37 @@ jobs:
 
       - name: Success message
         run: echo "Frontend Docker image successfully built and pushed to Docker Hub!"
+
+  deploy-to-nginx:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - name: Checkout tattoo-nginx repository
+        uses: actions/checkout@v4
+        with:
+          repository: mip92/tattoo-nginx
+          token: ${{ secrets.PAT_TOKEN }}
+          path: tattoo-nginx
+
+      - name: Check for changes
+        id: check-changes
+        run: |
+          cd tattoo-nginx
+          if git diff --quiet HEAD~1 HEAD; then
+            echo "no_changes=true" >> $GITHUB_OUTPUT
+            echo "No changes detected, skipping deployment"
+          else
+            echo "no_changes=false" >> $GITHUB_OUTPUT
+            echo "Changes detected, proceeding with deployment"
+          fi
+
+      - name: Trigger deployment action
+        if: steps.check-changes.outputs.no_changes == 'false'
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          repository: mip92/tattoo-nginx
+          event-type: deploy-frontend
+          client-payload: '{"frontend_image": "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"}'
