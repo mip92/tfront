@@ -70,17 +70,18 @@ jobs:
     if: success()
 
     steps:
-      - name: Checkout tattoo-nginx repository
+      - name: Checkout tattoo repository
         uses: actions/checkout@v4
         with:
           repository: mip92/tattoo
           token: ${{ secrets.PAT_TOKEN }}
-          path: tattoo-nginx
+          path: tattoo
+          fetch-depth: 2
 
       - name: Check for changes
         id: check-changes
         run: |
-          cd tattoo-nginx
+          cd tattoo
           if git diff --quiet HEAD~1 HEAD; then
             echo "no_changes=true" >> $GITHUB_OUTPUT
             echo "No changes detected, skipping deployment"
@@ -89,11 +90,40 @@ jobs:
             echo "Changes detected, proceeding with deployment"
           fi
 
+      - name: Debug repository dispatch
+        if: steps.check-changes.outputs.no_changes == 'false'
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          echo "🔍 Debug info:"
+          echo "Repository: mip92/tattoo"
+          echo "Event type: deploy-frontend"
+          echo "Token exists: $([[ -n "$PAT_TOKEN" ]] && echo true || echo false)"
+          echo "Token length: ${#PAT_TOKEN}"
+          echo "Token preview: ${PAT_TOKEN:0:10}..."
+
+      - name: Test API access
+        if: steps.check-changes.outputs.no_changes == 'false'
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          echo "🧪 Testing API access to tattoo repository..."
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: token $PAT_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/mip92/tattoo")
+          echo "API Response Code: $RESPONSE"
+          if [ "$RESPONSE" = "200" ]; then
+            echo "✅ API access successful"
+          else
+            echo "❌ API access failed with code: $RESPONSE"
+          fi
+
       - name: Trigger deployment action
         if: steps.check-changes.outputs.no_changes == 'false'
-        uses: peter-evans/repository-dispatch@v2
+        uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.PAT_TOKEN }}
-          repository: mip92/tattoo-nginx
+          repository: mip92/tattoo
           event-type: deploy-frontend
           client-payload: '{"frontend_image": "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"}'
