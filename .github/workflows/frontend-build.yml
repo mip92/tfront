@@ -76,6 +76,7 @@ jobs:
           repository: mip92/tattoo
           token: ${{ secrets.PAT_TOKEN }}
           path: tattoo-nginx
+          fetch-depth: 2
 
       - name: Check for changes
         id: check-changes
@@ -89,15 +90,16 @@ jobs:
             echo "Changes detected, proceeding with deployment"
           fi
 
-      - name: Trigger deployment action
+      - name: Debug repository dispatch
         if: steps.check-changes.outputs.no_changes == 'false'
-        uses: peter-evans/repository-dispatch@v2
-        with:
-          token: ${{ secrets.PAT_TOKEN }}
-          repository: mip92/tattoo-nginx
-          event-type: deploy-frontend
-          client-payload: '{"frontend_image": "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"}'
-cho "Token length: ${#PAT_TOKEN}"
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          echo "🔍 Debug info:"
+          echo "Repository: mip92/tattoo"
+          echo "Event type: deploy-frontend"
+          echo "Token exists: $([[ -n "$PAT_TOKEN" ]] && echo true || echo false)"
+          echo "Token length: ${#PAT_TOKEN}"
           echo "Token preview: ${PAT_TOKEN:0:10}..."
 
       - name: Test API access
