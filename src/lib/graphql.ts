@@ -1,5 +1,8 @@
 import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
+import { onError } from "@apollo/client/link/error";
+import { Observable } from "@apollo/client/utilities";
+import { tokenManager } from "./tokenManager";
 
 // GraphQL endpoint
 const httpLink = createHttpLink({
@@ -7,7 +10,6 @@ const httpLink = createHttpLink({
 });
 
 // Auth link to add token to headers
-
 const authLink = setContext((_, { headers }) => {
   let token = null;
   if (typeof window !== "undefined") {
@@ -21,8 +23,29 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
+const errorLink = onError(
+  ({ graphQLErrors, networkError, operation, forward }) => {
+    if (tokenManager.is401Error({ graphQLErrors, networkError })) {
+      return new Observable((observer: any) => {
+        tokenManager
+          .handle401Error(operation, forward)
+          .then((observable: any) => {
+            observable.subscribe({
+              next: (value: any) => observer.next(value),
+              error: (error: any) => observer.error(error),
+              complete: () => observer.complete(),
+            });
+          })
+          .catch((error: any) => {
+            observer.error(error);
+          });
+      });
+    }
+  }
+);
+
 export const client = new ApolloClient({
-  link: authLink.concat(httpLink),
+  link: errorLink.concat(authLink).concat(httpLink),
   cache: new InMemoryCache({
     typePolicies: {
       Query: {
@@ -56,24 +79,18 @@ function createPaginationMergeFunction(type: string) {
     existing: PaginationData = { rows: [], total: 0 },
     incoming: PaginationData
   ) => {
-    console.log(`Apollo cache merge for ${type}:`, { existing, incoming });
-
     if (incoming.rows.length > 0 && existing.rows.length === 0) {
-      console.log(`First request for ${type}, returning incoming data`);
       return incoming;
     }
 
     if (existing.rows.length >= incoming.total) {
-      console.log(`Already have all data for ${type}, returning existing`);
       return existing;
     }
 
-    const merged = {
+    return {
       total: incoming.total,
       rows: [...existing.rows, ...incoming.rows],
     };
-    console.log(`Merged data for ${type}:`, merged);
-    return merged;
   };
 }
 

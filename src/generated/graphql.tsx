@@ -346,7 +346,6 @@ export type Query = {
   brandsWithPagination: PaginatedBrandsResponse;
   getProfile: Scalars['String']['output'];
   product: ProductWithBrand;
-  products: Array<ProductWithBrand>;
   productsWithPagination: PaginatedProductsResponse;
   role?: Maybe<Role>;
   roleByName?: Maybe<Role>;
@@ -509,6 +508,13 @@ export type LogoutMutationVariables = Exact<{
 
 export type LogoutMutation = { __typename?: 'Mutation', logout: string };
 
+export type RefreshTokenMutationVariables = Exact<{
+  input: RefreshTokenInput;
+}>;
+
+
+export type RefreshTokenMutation = { __typename?: 'Mutation', refreshToken: { __typename?: 'AuthResponse', access_token: string, refresh_token: string } };
+
 export type GetBoxTypeQueryVariables = Exact<{
   id: Scalars['Int']['input'];
 }>;
@@ -627,6 +633,40 @@ export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<Logou
 export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
 export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
 export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
+export const RefreshTokenDocument = gql`
+    mutation RefreshToken($input: RefreshTokenInput!) {
+  refreshToken(input: $input) {
+    access_token
+    refresh_token
+  }
+}
+    `;
+export type RefreshTokenMutationFn = Apollo.MutationFunction<RefreshTokenMutation, RefreshTokenMutationVariables>;
+
+/**
+ * __useRefreshTokenMutation__
+ *
+ * To run a mutation, you first call `useRefreshTokenMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRefreshTokenMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [refreshTokenMutation, { data, loading, error }] = useRefreshTokenMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useRefreshTokenMutation(baseOptions?: Apollo.MutationHookOptions<RefreshTokenMutation, RefreshTokenMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RefreshTokenMutation, RefreshTokenMutationVariables>(RefreshTokenDocument, options);
+      }
+export type RefreshTokenMutationHookResult = ReturnType<typeof useRefreshTokenMutation>;
+export type RefreshTokenMutationResult = Apollo.MutationResult<RefreshTokenMutation>;
+export type RefreshTokenMutationOptions = Apollo.BaseMutationOptions<RefreshTokenMutation, RefreshTokenMutationVariables>;
 export const GetBoxTypeDocument = gql`
     query GetBoxType($id: Int!) {
   boxType(id: $id) {
