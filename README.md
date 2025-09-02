@@ -9,7 +9,7 @@ Next.js приложение для управления тату-салоном
 npm install
 
 # Создание .env файла
-echo "NEXT_PUBLIC_SERVER_URL=http://localhost:4000/graphql" > .env
+echo "NEXT_PUBLIC_API_URL=http://localhost:4000/graphql" > .env
 
 # Генерация GraphQL типов
 npm run codegen
@@ -51,7 +51,7 @@ docker pull mip92/tattoo-client:latest
 
 ## 🔐 Переменные окружения
 
-- `NEXT_PUBLIC_SERVER_URL` - GraphQL сервер (по умолчанию: `http://localhost:4000/graphql`)
+- `NEXT_PUBLIC_API_URL` - GraphQL сервер (по умолчанию: `http://localhost:4000/graphql`)
 
 ## 📦 Технологии
 
