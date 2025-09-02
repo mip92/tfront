@@ -1,4 +1,9 @@
-import { ApolloClient, InMemoryCache, createHttpLink, FetchResult } from "@apollo/client";
+import {
+  ApolloClient,
+  InMemoryCache,
+  createHttpLink,
+  FetchResult,
+} from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
 import { Observable } from "@apollo/client/utilities";
@@ -25,7 +30,12 @@ const authLink = setContext((_, { headers }) => {
 
 const errorLink = onError(
   ({ graphQLErrors, networkError, operation, forward }) => {
-    if (tokenManager.is401Error({ graphQLErrors: graphQLErrors as unknown[], networkError: networkError as { statusCode?: number } })) {
+    if (
+      tokenManager.is401Error({
+        graphQLErrors: graphQLErrors as unknown[],
+        networkError: networkError as { statusCode?: number },
+      })
+    ) {
       return new Observable((observer) => {
         tokenManager
           .handle401Error(operation, forward)

@@ -15,7 +15,12 @@ class TokenManager {
   private failedQueue: QueuedRequest[] = [];
   private refreshPromise: Promise<string> | null = null;
 
-  private addToQueue(resolve: (value: Observable<unknown>) => void, reject: (error: Error) => void, operation: Operation, forward: NextLink) {
+  private addToQueue(
+    resolve: (value: Observable<unknown>) => void,
+    reject: (error: Error) => void,
+    operation: Operation,
+    forward: NextLink
+  ) {
     this.failedQueue.push({ resolve, reject, operation, forward });
   }
 
@@ -73,7 +78,10 @@ class TokenManager {
     }
   }
 
-  handle401Error(operation: Operation, forward: NextLink): Promise<Observable<unknown>> {
+  handle401Error(
+    operation: Operation,
+    forward: NextLink
+  ): Promise<Observable<unknown>> {
     if (this.isRefreshing) {
       return new Promise((resolve, reject) => {
         this.addToQueue(resolve, reject, operation, forward);
@@ -110,12 +118,19 @@ class TokenManager {
     });
   }
 
-  is401Error(error: { graphQLErrors?: unknown[]; networkError?: { statusCode?: number }; message?: string }): boolean {
+  is401Error(error: {
+    graphQLErrors?: unknown[];
+    networkError?: { statusCode?: number };
+    message?: string;
+  }): boolean {
     return (
       error?.networkError?.statusCode === 401 ||
       (error?.graphQLErrors?.some(
-        (e: unknown) => (e as { extensions?: { code?: string } })?.extensions?.code === "UNAUTHENTICATED"
-      ) ?? false) ||
+        (e: unknown) =>
+          (e as { extensions?: { code?: string } })?.extensions?.code ===
+          "UNAUTHENTICATED"
+      ) ??
+        false) ||
       (error?.message?.includes("401") ?? false) ||
       (error?.message?.includes("Unauthorized") ?? false)
     );
