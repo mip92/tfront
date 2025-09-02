@@ -1,4 +1,4 @@
-import { GetProductQuery, GetProductQueryVariables } from "@/generated/graphql";
+import { GetProductQuery } from "@/generated/graphql";
 
 // Функция для серверных GraphQL запросов
 export async function serverQuery<T = unknown>(

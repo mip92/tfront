@@ -49,7 +49,7 @@ export async function generateMetadata({
         }),
       },
     };
-  } catch (error) {
+  } catch {
     // Если не удалось загрузить данные, используем базовые метаданные
     return {
       ...pageSEO.productDetail(productId),

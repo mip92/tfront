@@ -86,7 +86,7 @@ export const AsyncGenericList = <T,>({
     } catch (error) {
       console.error("Error loading more items:", error);
     }
-  }, [items.rows.length, isLoading, hasMore, loadMore, take]);
+  }, [items.rows.length, items.total, isLoading, hasMore, loadMore, take]);
 
   useEffect(() => {
     const hiddenDiv = document.querySelector("[data-hidden-loader]");

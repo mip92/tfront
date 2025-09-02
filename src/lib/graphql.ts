@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
+import { ApolloClient, InMemoryCache, createHttpLink, FetchResult } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
 import { Observable } from "@apollo/client/utilities";
@@ -25,18 +25,18 @@ const authLink = setContext((_, { headers }) => {
 
 const errorLink = onError(
   ({ graphQLErrors, networkError, operation, forward }) => {
-    if (tokenManager.is401Error({ graphQLErrors, networkError })) {
-      return new Observable((observer: any) => {
+    if (tokenManager.is401Error({ graphQLErrors: graphQLErrors as unknown[], networkError: networkError as { statusCode?: number } })) {
+      return new Observable((observer) => {
         tokenManager
           .handle401Error(operation, forward)
-          .then((observable: any) => {
+          .then((observable) => {
             observable.subscribe({
-              next: (value: any) => observer.next(value),
-              error: (error: any) => observer.error(error),
+              next: (value) => observer.next(value as FetchResult),
+              error: (error) => observer.error(error),
               complete: () => observer.complete(),
             });
           })
-          .catch((error: any) => {
+          .catch((error) => {
             observer.error(error);
           });
       });
@@ -52,15 +52,15 @@ export const client = new ApolloClient({
         fields: {
           productsWithPagination: {
             keyArgs: ["query", ["search"]],
-            merge: createPaginationMergeFunction("products"),
+            merge: createPaginationMergeFunction(),
           },
           brandsWithPagination: {
             keyArgs: ["query", ["search"]],
-            merge: createPaginationMergeFunction("brands"),
+            merge: createPaginationMergeFunction(),
           },
           boxTypesWithPagination: {
             keyArgs: ["query", ["search"]],
-            merge: createPaginationMergeFunction("box types"),
+            merge: createPaginationMergeFunction(),
           },
         },
       },
@@ -74,7 +74,7 @@ interface PaginationData {
   total: number;
 }
 
-function createPaginationMergeFunction(type: string) {
+function createPaginationMergeFunction() {
   return (
     existing: PaginationData = { rows: [], total: 0 },
     incoming: PaginationData

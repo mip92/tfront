@@ -84,7 +84,7 @@ export function useProductsInfinite(searchTerm: string) {
           rows: [],
           total: 0,
         };
-      } catch (error) {
+      } catch {
         return {
           rows: [],
           total: 0,
