@@ -4,7 +4,15 @@ query GetProductsWithPagination($query: ProductsQueryDto!) {
       id
       name
       brand {
+        id
         name
+      }
+      mainFile {
+        id
+        filename
+        s3Key
+        type
+        url
       }
       brandId
       createdAt

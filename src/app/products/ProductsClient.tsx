@@ -7,11 +7,11 @@ import { Plus, Search, Filter, Package, Loader2 } from "lucide-react";
 import { AsyncGenericList } from "@/components/AsyncGenericList";
 import { ProductSkeleton } from "@/components/ProductSkeleton";
 import Link from "next/link";
-import {
-  useProductsInfinite,
-  type ProductFromQuery,
-} from "@/hooks/useProductsInfinite";
 import { useSetBreadcrumbs } from "@/hooks/useSetBreadcrumbs";
+import {
+  ProductFromQuery,
+  useProductsInfinite,
+} from "@/hooks/useProductsInfinite";
 
 export function ProductsClient() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -42,8 +42,16 @@ export function ProductsClient() {
   const renderProduct = useCallback(
     (product: ProductFromQuery) => (
       <Card key={product.id} className="overflow-hidden">
-        <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
-          <Package className="h-16 w-16 text-gray-400" />
+        <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center overflow-hidden">
+          {product.mainFile?.url ? (
+            <img
+              src={product.mainFile.url}
+              alt={product.mainFile.filename || "Product image"}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <Package className="h-16 w-16 text-gray-400" />
+          )}
         </div>
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">{product.name}</CardTitle>

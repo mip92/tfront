@@ -1,19 +1,11 @@
 import { useCallback, useMemo, useState } from "react";
-import { useGetProductsWithPaginationQuery } from "@/generated/graphql";
+import {
+  useGetProductsWithPaginationQuery,
+  GetProductsWithPaginationQuery,
+} from "@/generated/graphql";
 
-export type ProductFromQuery = {
-  __typename?: "ProductWithBrand";
-  id: number;
-  name: string;
-  brandId: number;
-  createdAt: string;
-  type: string; // Changed from 'any' to 'string'
-  updatedAt: string;
-  brand: {
-    __typename?: "Brand";
-    name: string;
-  };
-};
+export type ProductFromQuery =
+  GetProductsWithPaginationQuery["productsWithPagination"]["rows"][0];
 
 export interface PaginationOutResponse<T> {
   rows: T[];
@@ -43,7 +35,7 @@ export function useProductsInfinite(searchTerm: string) {
       fetchPolicy: "cache-and-network",
     });
 
-  const productsData = useMemo(() => {
+  const productsData = useMemo((): PaginationOutResponse<ProductFromQuery> => {
     if (data?.productsWithPagination) {
       return {
         rows: data.productsWithPagination.rows.filter(Boolean),
