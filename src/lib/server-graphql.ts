@@ -1,4 +1,4 @@
-import { GetProductQuery } from "@/generated/graphql";
+import { GetProductQuery } from '@/generated/graphql';
 
 // Функция для серверных GraphQL запросов
 export async function serverQuery<T = unknown>(
@@ -7,11 +7,11 @@ export async function serverQuery<T = unknown>(
 ): Promise<T> {
   try {
     const response = await fetch(
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/graphql",
+      process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/graphql',
       {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           query,
@@ -32,7 +32,8 @@ export async function serverQuery<T = unknown>(
 
     return data.data;
   } catch (error) {
-    console.error("Server GraphQL error:", error);
+    console.error('Server GraphQL error:', error);
+
     throw error;
   }
 }
