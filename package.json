@@ -10,7 +10,7 @@
     "build:docker": "next build",
     "codegen": "graphql-codegen --config graphql.config.ts",
     "codegen:watch": "graphql-codegen --config graphql.config.ts --watch",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "dependencies": {
     "@apollo/client": "^3.14.0",

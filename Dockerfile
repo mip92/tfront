@@ -14,6 +14,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Устанавливаем ТОЛЬКО production зависимости
+ENV HUSKY=0
 RUN npm ci --only=production --no-audit --no-fund --prefer-offline --no-optional
 
 # Копируем собранное приложение с локалки
