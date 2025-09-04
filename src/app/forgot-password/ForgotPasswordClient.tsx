@@ -1,42 +1,42 @@
-"use client";
+'use client';
 
-import React, { useState, useMemo } from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { useForgotPasswordMutation } from "@/generated/graphql";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import React, { useState, useMemo } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import { useForgotPasswordMutation } from '@/generated/graphql';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { AlertCircle, Loader2, CheckCircle, ArrowLeft } from "lucide-react";
-import { useSetBreadcrumbs } from "@/hooks/useSetBreadcrumbs";
-import Link from "next/link";
+} from '@/components/ui/card';
+import { AlertCircle, Loader2, CheckCircle, ArrowLeft } from 'lucide-react';
+import { useSetBreadcrumbs } from '@/hooks/useSetBreadcrumbs';
+import Link from 'next/link';
 
 const forgotPasswordSchema = yup.object({
   email: yup
     .string()
-    .email("Please enter a valid email address")
-    .required("Email is required"),
+    .email('Please enter a valid email address')
+    .required('Email is required'),
 });
 
 type ForgotPasswordFormData = yup.InferType<typeof forgotPasswordSchema>;
 
 export function ForgotPasswordClient() {
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
   const [forgotPasswordMutation, { loading }] = useForgotPasswordMutation();
 
   const breadcrumbItems = useMemo(
     () => [
-      { label: "Forgot Password", href: "/forgot-password", isActive: true },
+      { label: 'Forgot Password', href: '/forgot-password', isActive: true },
     ],
     []
   );
@@ -52,7 +52,7 @@ export function ForgotPasswordClient() {
   });
 
   const onSubmit = async (data: ForgotPasswordFormData) => {
-    setError("");
+    setError('');
     setSuccess(false);
 
     try {
@@ -68,7 +68,7 @@ export function ForgotPasswordClient() {
       const errorMessage =
         err instanceof Error
           ? err.message
-          : "An error occurred while sending reset email";
+          : 'An error occurred while sending reset email';
       setError(errorMessage);
     }
   };
@@ -95,7 +95,7 @@ export function ForgotPasswordClient() {
               <Button
                 onClick={() => {
                   setSuccess(false);
-                  setError("");
+                  setError('');
                 }}
                 variant="outline"
                 className="w-full"
@@ -131,8 +131,8 @@ export function ForgotPasswordClient() {
               id="email"
               type="email"
               placeholder="Enter your email"
-              {...register("email")}
-              className={errors.email ? "border-red-500" : ""}
+              {...register('email')}
+              className={errors.email ? 'border-red-500' : ''}
             />
             {errors.email && (
               <p className="text-sm text-red-600 flex items-center gap-2">
@@ -156,14 +156,14 @@ export function ForgotPasswordClient() {
                 Sending...
               </>
             ) : (
-              "Send Reset Link"
+              'Send Reset Link'
             )}
           </Button>
         </form>
 
         <div className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
           <p>
-            Remember your password?{" "}
+            Remember your password?{' '}
             <Link
               href="/auth"
               className="text-blue-600 hover:text-blue-500 dark:text-blue-400"
