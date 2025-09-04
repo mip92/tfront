@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useForgotPasswordMutation } from "@/generated/graphql";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,7 +31,6 @@ type ForgotPasswordFormData = yup.InferType<typeof forgotPasswordSchema>;
 export function ForgotPasswordClient() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const router = useRouter();
 
   const [forgotPasswordMutation, { loading }] = useForgotPasswordMutation();
 
@@ -84,13 +82,13 @@ export function ForgotPasswordClient() {
           </div>
           <CardTitle className="text-2xl font-bold">Check your email</CardTitle>
           <CardDescription>
-            We've sent a password reset link to your email address
+            We&apos;ve sent a password reset link to your email address
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center space-y-4">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              If you don't see the email, check your spam folder or try again.
+              If you don&apos;t see the email, check your spam folder or try again.
             </p>
             <div className="space-y-2">
               <Button
@@ -121,7 +119,7 @@ export function ForgotPasswordClient() {
       <CardHeader className="space-y-1 text-center">
         <CardTitle className="text-2xl font-bold">Forgot Password</CardTitle>
         <CardDescription>
-          Enter your email address and we'll send you a reset link
+          Enter your email address and we&apos;ll send you a reset link
         </CardDescription>
       </CardHeader>
       <CardContent>

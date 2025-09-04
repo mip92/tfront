@@ -76,8 +76,7 @@ export function ResetPasswordClient() {
       const result = await resetPasswordMutation({
         variables: {
           input: {
-            token,
-            password: data.password,
+            newPassword: data.password,
           },
         },
       });
