@@ -29,12 +29,19 @@ class TokenManager {
       if (error) {
         reject(error);
       } else {
+        const refreshToken = localStorage.getItem("refreshToken");
+        const oldHeaders = operation.getContext().headers || {};
+
+        // Update the operation context with new tokens
         operation.setContext({
           headers: {
-            ...operation.getContext().headers,
+            ...oldHeaders,
             authorization: token ? `Bearer ${token}` : "",
+            "x-refresh-token": refreshToken || "",
           },
         });
+
+        // Use the original operation with updated context
         const observable = forward(operation);
         resolve(observable);
       }
@@ -52,9 +59,9 @@ class TokenManager {
     try {
       const { data } = await client.mutate({
         mutation: RefreshTokenDocument,
-        variables: {
-          input: {
-            refreshToken: refreshToken,
+        context: {
+          headers: {
+            "x-refresh-token": refreshToken,
           },
         },
         fetchPolicy: "no-cache",
@@ -96,14 +103,21 @@ class TokenManager {
 
     return new Promise((resolve, reject) => {
       this.refreshPromise!.then((newToken) => {
+        const newRefreshToken = localStorage.getItem("refreshToken");
+
+        // Update the operation context with new tokens
+        const oldHeaders = operation.getContext().headers || {};
         operation.setContext({
           headers: {
-            ...operation.getContext().headers,
+            ...oldHeaders,
             authorization: `Bearer ${newToken}`,
+            "x-refresh-token": newRefreshToken || "",
           },
         });
 
         this.processQueue(null, newToken);
+
+        // Use the original operation with updated context, don't create a new one
         const observable = forward(operation);
         resolve(observable);
       })

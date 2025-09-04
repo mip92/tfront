@@ -16,14 +16,17 @@ const httpLink = createHttpLink({
 
 // Auth link to add token to headers
 const authLink = setContext((_, { headers }) => {
-  let token = null;
+  let accessToken = null;
+  let refreshToken = null;
   if (typeof window !== "undefined") {
-    token = localStorage.getItem("accessToken");
+    accessToken = localStorage.getItem("accessToken");
+    refreshToken = localStorage.getItem("refreshToken");
   }
   return {
     headers: {
       ...headers,
-      authorization: token ? `Bearer ${token}` : "",
+      authorization: accessToken ? `Bearer ${accessToken}` : "",
+      "x-refresh-token": refreshToken || "",
     },
   };
 });

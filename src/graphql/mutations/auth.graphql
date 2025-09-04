@@ -15,13 +15,53 @@ mutation Login($input: LoginInput!) {
   }
 }
 
-mutation Logout($refreshToken: String!) {
-  logout(refreshToken: $refreshToken)
+mutation Logout {
+  logout
 }
 
-mutation RefreshToken($input: RefreshTokenInput!) {
-  refreshToken(input: $input) {
+mutation RefreshToken {
+  refreshToken {
     access_token
     refresh_token
+  }
+}
+
+mutation ForgotPassword($input: ForgotPasswordInput!) {
+  forgotPassword(input: $input) {
+    message
+  }
+}
+
+mutation Register($input: RegisterInput!) {
+  register(input: $input) {
+    access_token
+    refresh_token
+    user {
+      id
+      email
+      firstName
+      lastName
+      role {
+        id
+        name
+      }
+    }
+  }
+}
+
+mutation ResetPassword($input: ResetPasswordInput!) {
+  resetPassword(input: $input) {
+    access_token
+    refresh_token
+    user {
+      id
+      email
+      firstName
+      lastName
+      role {
+        id
+        name
+      }
+    }
   }
 }
