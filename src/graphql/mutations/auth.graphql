@@ -49,8 +49,8 @@ mutation Register($input: RegisterInput!) {
   }
 }
 
-mutation ResetPassword($token: String!, $input: ResetPasswordInput!) {
-  resetPassword(token: $token, input: $input) {
+mutation ResetPassword($input: ResetPasswordInput!) {
+  resetPassword(input: $input) {
     access_token
     refresh_token
     user {
