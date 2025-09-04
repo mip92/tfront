@@ -88,7 +88,8 @@ export function ForgotPasswordClient() {
         <CardContent>
           <div className="text-center space-y-4">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              If you don&apos;t see the email, check your spam folder or try again.
+              If you don&apos;t see the email, check your spam folder or try
+              again.
             </p>
             <div className="space-y-2">
               <Button
