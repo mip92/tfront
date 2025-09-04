@@ -81,7 +81,7 @@ export function AuthClient() {
   };
 
   return (
-    <Card className="w-full max-w-md">
+    <Card>
       <CardHeader className="space-y-1 text-center">
         <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
         <CardDescription>
