@@ -1,7 +1,7 @@
-import { client } from "./graphql";
-import { RefreshTokenDocument } from "@/generated/graphql";
-import { Operation, NextLink } from "@apollo/client";
-import { Observable } from "@apollo/client/utilities";
+import { client } from './graphql';
+import { RefreshTokenDocument } from '@/generated/graphql';
+import { Operation, NextLink } from '@apollo/client';
+import { Observable } from '@apollo/client/utilities';
 
 interface QueuedRequest {
   resolve: (value: Observable<unknown>) => void;
@@ -29,19 +29,18 @@ class TokenManager {
       if (error) {
         reject(error);
       } else {
-        const refreshToken = localStorage.getItem("refreshToken");
+        const refreshToken = localStorage.getItem('refreshToken');
         const oldHeaders = operation.getContext().headers || {};
 
         // Update the operation context with new tokens
         operation.setContext({
           headers: {
             ...oldHeaders,
-            authorization: token ? `Bearer ${token}` : "",
-            "x-refresh-token": refreshToken || "",
+            authorization: token ? `Bearer ${token}` : '',
+            'x-refresh-token': refreshToken || '',
           },
         });
 
-        // Use the original operation with updated context
         const observable = forward(operation);
         resolve(observable);
       }
@@ -50,10 +49,10 @@ class TokenManager {
     this.failedQueue = [];
   }
   private async refreshAccessToken(): Promise<string> {
-    const refreshToken = localStorage.getItem("refreshToken");
+    const refreshToken = localStorage.getItem('refreshToken');
 
     if (!refreshToken) {
-      throw new Error("No refresh token available");
+      throw new Error('No refresh token available');
     }
 
     try {
@@ -61,26 +60,26 @@ class TokenManager {
         mutation: RefreshTokenDocument,
         context: {
           headers: {
-            "x-refresh-token": refreshToken,
+            'x-refresh-token': refreshToken,
           },
         },
-        fetchPolicy: "no-cache",
+        fetchPolicy: 'no-cache',
       });
 
       if (!data?.refreshToken?.access_token) {
-        throw new Error("No access token in refresh response");
+        throw new Error('No access token in refresh response');
       }
 
-      localStorage.setItem("accessToken", data.refreshToken.access_token);
+      localStorage.setItem('accessToken', data.refreshToken.access_token);
       if (data.refreshToken.refresh_token) {
-        localStorage.setItem("refreshToken", data.refreshToken.refresh_token);
+        localStorage.setItem('refreshToken', data.refreshToken.refresh_token);
       }
 
       return data.refreshToken.access_token;
     } catch (error) {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("user");
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
       throw error;
     }
   }
@@ -102,8 +101,8 @@ class TokenManager {
     }
 
     return new Promise((resolve, reject) => {
-      this.refreshPromise!.then((newToken) => {
-        const newRefreshToken = localStorage.getItem("refreshToken");
+      this.refreshPromise!.then(newToken => {
+        const newRefreshToken = localStorage.getItem('refreshToken');
 
         // Update the operation context with new tokens
         const oldHeaders = operation.getContext().headers || {};
@@ -111,7 +110,7 @@ class TokenManager {
           headers: {
             ...oldHeaders,
             authorization: `Bearer ${newToken}`,
-            "x-refresh-token": newRefreshToken || "",
+            'x-refresh-token': newRefreshToken || '',
           },
         });
 
@@ -121,7 +120,7 @@ class TokenManager {
         const observable = forward(operation);
         resolve(observable);
       })
-        .catch((error) => {
+        .catch(error => {
           this.processQueue(error, null);
           reject(error);
         })
@@ -142,11 +141,11 @@ class TokenManager {
       (error?.graphQLErrors?.some(
         (e: unknown) =>
           (e as { extensions?: { code?: string } })?.extensions?.code ===
-          "UNAUTHENTICATED"
+          'UNAUTHENTICATED'
       ) ??
         false) ||
-      (error?.message?.includes("401") ?? false) ||
-      (error?.message?.includes("Unauthorized") ?? false)
+      (error?.message?.includes('401') ?? false) ||
+      (error?.message?.includes('Unauthorized') ?? false)
     );
   }
 }
