@@ -1,25 +1,26 @@
-"use client";
+'use client';
 
-import React, { useState, useCallback, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Plus, Search, Filter, Package, Loader2 } from "lucide-react";
-import { AsyncGenericList } from "@/components/AsyncGenericList";
-import { ProductSkeleton } from "@/components/ProductSkeleton";
-import Link from "next/link";
-import { useSetBreadcrumbs } from "@/hooks/useSetBreadcrumbs";
+import React, { useState, useCallback, useMemo } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Plus, Search, Filter, Package, Loader2 } from 'lucide-react';
+import { AsyncGenericList } from '@/components/AsyncGenericList';
+import { ProductSkeleton } from '@/components/ProductSkeleton';
+import Link from 'next/link';
+import Image from 'next/image';
+import { useSetBreadcrumbs } from '@/hooks/useSetBreadcrumbs';
 import {
   ProductFromQuery,
   useProductsInfinite,
-} from "@/hooks/useProductsInfinite";
+} from '@/hooks/useProductsInfinite';
 
 export function ProductsClient() {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const { productsData, loadMore, loading, loadingMore, error, refetch, take } =
     useProductsInfinite(searchTerm);
 
   const breadcrumbItems = useMemo(
-    () => [{ label: "Products", href: "/products", isActive: true }],
+    () => [{ label: 'Products', href: '/products', isActive: true }],
     []
   );
 
@@ -42,12 +43,13 @@ export function ProductsClient() {
   const renderProduct = useCallback(
     (product: ProductFromQuery) => (
       <Card key={product.id} className="overflow-hidden">
-        <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center overflow-hidden">
+        <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center overflow-hidden">
           {product.mainFile?.url ? (
-            <img
+            <Image
               src={product.mainFile.url}
-              alt={product.mainFile.filename || "Product image"}
-              className="w-full h-full object-cover"
+              alt={product.mainFile.filename || 'Product image'}
+              fill
+              className="object-cover"
             />
           ) : (
             <Package className="h-16 w-16 text-gray-400" />
@@ -107,7 +109,7 @@ export function ProductsClient() {
               type="text"
               placeholder="Search products..."
               value={searchTerm}
-              onChange={(e) => handleSearch(e.target.value)}
+              onChange={e => handleSearch(e.target.value)}
               className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               aria-label="Search products"
             />
@@ -167,7 +169,7 @@ export function ProductsClient() {
           <p className="text-muted-foreground mb-4">
             {searchTerm
               ? `No products match "${searchTerm}"`
-              : "Get started by adding your first product"}
+              : 'Get started by adding your first product'}
           </p>
           <Button>
             <Plus className="h-4 w-4 mr-2" />

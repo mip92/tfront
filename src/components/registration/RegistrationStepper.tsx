@@ -101,7 +101,7 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
   const handleGoBack = async () => {
     clearError();
     try {
-      await goBackStep({ userId: state.userId! });
+      await goBackStep();
     } catch {}
   };
 
