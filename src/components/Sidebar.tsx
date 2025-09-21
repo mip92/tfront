@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import {
   Home,
   LayoutDashboard,
@@ -18,7 +18,7 @@ import {
   ChevronRight,
   Package,
   Tag,
-} from "lucide-react";
+} from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -35,24 +35,24 @@ interface NavigationItem {
 }
 
 const navigationItems: NavigationItem[] = [
-  { href: "/", label: "Home", icon: Home },
+  { href: '/', label: 'Home', icon: Home },
   {
-    href: "/dashboard",
-    label: "Dashboard",
+    href: '/dashboard',
+    label: 'Dashboard',
     icon: LayoutDashboard,
     requiresAuth: true,
   },
   {
-    href: "/admin",
-    label: "Admin Panel",
+    href: '/admin',
+    label: 'Admin Panel',
     icon: Shield,
-    requiresRole: ["admin"],
+    requiresRole: ['admin'],
   },
-  { href: "/profile", label: "Profile", icon: User, requiresAuth: true },
-  { href: "/settings", label: "Settings", icon: Settings, requiresAuth: true },
-  { href: "/products", label: "Products", icon: Package, requiresAuth: true },
-  { href: "/brands", label: "Brands", icon: Tag, requiresAuth: true },
-  { href: "/box-types", label: "Box Types", icon: Package, requiresAuth: true },
+  { href: '/profile', label: 'Profile', icon: User, requiresAuth: true },
+  { href: '/settings', label: 'Settings', icon: Settings, requiresAuth: true },
+  { href: '/products', label: 'Products', icon: Package, requiresAuth: true },
+  { href: '/brands', label: 'Brands', icon: Tag, requiresAuth: true },
+  { href: '/box-types', label: 'Box Types', icon: Package, requiresAuth: true },
 ];
 
 export default function Sidebar({
@@ -64,7 +64,7 @@ export default function Sidebar({
   const { isAuthenticated, user, logout } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const filteredItems = navigationItems.filter((item) => {
+  const filteredItems = navigationItems.filter(item => {
     if (item.requiresAuth && !isAuthenticated) return false;
     if (item.requiresRole && item.requiresRole.length > 0) {
       const userRole = user?.role?.name;
@@ -78,13 +78,13 @@ export default function Sidebar({
       {/* Logo */}
       <div
         className={`${
-          isCollapsed ? "h-14 px-3" : "h-14 px-6"
-        } flex items-center border-b border-gray-200 dark:border-gray-700`}
+          isCollapsed ? 'h-14 px-3' : 'h-14 px-4 sm:px-6 lg:px-8'
+        } flex items-center bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700`}
       >
         <Link
           href="/"
           className={`flex items-center ${
-            isCollapsed ? "justify-center" : "space-x-2"
+            isCollapsed ? 'justify-center' : 'space-x-2'
           }`}
           onClick={onClose}
         >
@@ -101,7 +101,7 @@ export default function Sidebar({
 
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2">
-        {filteredItems.map((item) => {
+        {filteredItems.map(item => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
 
@@ -111,11 +111,11 @@ export default function Sidebar({
               href={item.href}
               onClick={onClose}
               className={`flex items-center ${
-                isCollapsed ? "justify-center px-2" : "space-x-3 px-3"
+                isCollapsed ? 'justify-center px-2' : 'space-x-3 px-3'
               } py-2 rounded-lg text-sm font-medium transition-colors ${
                 isActive
-                  ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border-r-2 border-blue-600"
-                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border-r-2 border-blue-600'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
               }`}
               title={isCollapsed ? item.label : undefined}
             >
@@ -130,7 +130,7 @@ export default function Sidebar({
       {isAuthenticated && (
         <div
           className={`${
-            isCollapsed ? "p-2" : "p-4"
+            isCollapsed ? 'p-2' : 'p-4'
           } border-t border-gray-200 dark:border-gray-700`}
         >
           {!isCollapsed ? (
@@ -207,11 +207,11 @@ export default function Sidebar({
   return (
     <>
       <div
-        className={`hidden md:flex md:flex-col md:fixed md:inset-y-0 md:z-50 transition-all duration-300 ${
-          isCollapsed ? "md:w-16" : "md:w-64"
+        className={`hidden md:flex md:flex-col md:fixed md:inset-y-0 md:z-[70] transition-all duration-300 ${
+          isCollapsed ? 'md:w-16' : 'md:w-64'
         }`}
       >
-        <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700">
+        <div className="flex-1 flex flex-col min-h-0 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 relative z-[70]">
           <SidebarContent />
         </div>
       </div>

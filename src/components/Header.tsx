@@ -1,36 +1,28 @@
-"use client";
+'use client';
 
-import React from "react";
-import Link from "next/link";
-import { useAuth } from "@/contexts/AuthContext";
-import { useTheme } from "@/contexts/ThemeContext";
-import { Button } from "@/components/ui/button";
-import { Moon, Sun, User, LogOut } from "lucide-react";
-import { MobileMenuButton } from "./Sidebar";
+import React from 'react';
+import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Button } from '@/components/ui/button';
+import { Moon, Sun, User, LogOut } from 'lucide-react';
+import { MobileMenuButton } from './Sidebar';
 
 interface HeaderProps {
   onSidebarOpen: () => void;
-  isSidebarOpen?: boolean;
 }
 
-export default function Header({
-  onSidebarOpen,
-  isSidebarOpen = false,
-}: HeaderProps) {
+export default function Header({ onSidebarOpen }: HeaderProps) {
   const { isAuthenticated, user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white dark:bg-gray-900">
-      <div className="w-full flex h-14 items-center px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-x-hidden">
+      <div className="w-full flex h-14 items-center px-4 sm:px-6 lg:px-8 min-w-0">
         <MobileMenuButton onOpen={onSidebarOpen} />
 
-        <div
-          className={`flex mr-4 transition-all duration-300 ${
-            isSidebarOpen ? "opacity-0 w-0 overflow-hidden" : "opacity-100"
-          }`}
-        >
-          <Link href="/" className="flex items-center space-x-2">
+        <div className="flex mr-4 min-w-0 flex-shrink-0">
+          <Link href="/" className="flex items-center space-x-2 min-w-0">
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
               <span className="text-white font-bold text-sm">T</span>
             </div>
@@ -40,9 +32,9 @@ export default function Header({
           </Link>
         </div>
 
-        <div className="flex flex-1 items-center justify-end space-x-2">
+        <div className="flex flex-1 items-center justify-end space-x-2 min-w-0">
           {/* Navigation Menu */}
-          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium mr-4">
+          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium mr-4 min-w-0 flex-shrink-0">
             {isAuthenticated ? (
               <>
                 <Link
@@ -63,7 +55,7 @@ export default function Header({
                 >
                   Box Types
                 </Link>
-                {user?.role?.name === "admin" && (
+                {user?.role?.name === 'admin' && (
                   <Link
                     href="/admin"
                     className="transition-colors hover:text-blue-600 text-gray-700 dark:text-gray-300"
@@ -82,7 +74,7 @@ export default function Header({
             )}
           </nav>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 min-w-0 flex-shrink-0">
             <Button
               variant="ghost"
               size="icon"
@@ -90,7 +82,7 @@ export default function Header({
               className="h-9 w-9"
               aria-label="Toggle theme"
             >
-              {theme === "light" ? (
+              {theme === 'light' ? (
                 <Moon className="h-4 w-4" />
               ) : (
                 <Sun className="h-4 w-4" />
@@ -98,10 +90,10 @@ export default function Header({
             </Button>
 
             {isAuthenticated ? (
-              <div className="flex items-center space-x-2">
-                <div className="hidden sm:flex items-center space-x-2 text-sm">
+              <div className="flex items-center space-x-2 min-w-0">
+                <div className="hidden sm:flex items-center space-x-2 text-sm min-w-0">
                   <User className="h-4 w-4" />
-                  <span className="text-gray-700 dark:text-gray-300">
+                  <span className="text-gray-700 dark:text-gray-300 truncate">
                     {user?.email}
                   </span>
                   {user?.role && (

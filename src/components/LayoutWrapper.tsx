@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import Link from "next/link";
-import Header from "./Header";
-import Sidebar from "./Sidebar";
-import { useBreadcrumbs } from "@/contexts/BreadcrumbsContext";
+import React, { useState } from 'react';
+import Link from 'next/link';
+import Header from './Header';
+import Sidebar from './Sidebar';
+import { useBreadcrumbs } from '@/contexts/BreadcrumbsContext';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -12,7 +12,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+} from '@/components/ui/breadcrumb';
 
 export default function LayoutWrapper({
   children,
@@ -24,11 +24,8 @@ export default function LayoutWrapper({
   const { breadcrumbs } = useBreadcrumbs();
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header
-        onSidebarOpen={() => setIsSidebarOpen(true)}
-        isSidebarOpen={isSidebarOpen}
-      />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 overflow-x-hidden">
+      <Header onSidebarOpen={() => setIsSidebarOpen(true)} />
       <div className="flex">
         <Sidebar
           isOpen={isSidebarOpen}
@@ -36,8 +33,8 @@ export default function LayoutWrapper({
           onCollapseChange={setIsSidebarCollapsed}
         />
         <main
-          className={`flex-1 transition-all duration-300 ${
-            isSidebarCollapsed ? "md:ml-16" : "md:ml-64"
+          className={`flex-1 transition-all duration-300 min-w-0 ${
+            isSidebarCollapsed ? 'md:ml-16' : 'md:ml-64'
           }`}
         >
           {/* Breadcrumbs */}

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React, { useCallback, useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import React, { useCallback, useEffect, useState } from 'react';
+import { Loader2 } from 'lucide-react';
 
 interface PaginationOutResponse<T> {
   rows: T[];
@@ -33,8 +33,8 @@ export const AsyncGenericList = <T,>({
   renderItem,
   skeletonComponent: SkeletonComponent,
   take = 10,
-  loadingText = "Loading more items...",
-  noMoreItemsText = "No more items to load",
+  loadingText = 'Loading more items...',
+  noMoreItemsText = 'No more items to load',
   isLoading = false, // Состояние загрузки из Apollo
   gridCols = {
     xs: 1,
@@ -52,49 +52,33 @@ export const AsyncGenericList = <T,>({
   }, [items.rows.length]);
 
   const handleLoadMore = useCallback(async () => {
-    console.log(
-      "handleLoadMore called, isLoading:",
-      isLoading,
-      "hasMore:",
-      hasMore,
-      "current items:",
-      items.rows.length,
-      "total:",
-      items.total
-    );
     if (isLoading || !hasMore) return;
 
     if (items.rows.length >= items.total) {
-      console.log("Already have all items, setting hasMore to false");
       setHasMore(false);
       return;
     }
 
     try {
       const currentSkip = items.rows.length;
-      console.log("Calling loadMore with skip:", currentSkip, "take:", take);
       const response = await loadMore(currentSkip, take);
       const { rows: newItems, total } = response;
-      console.log("LoadMore response:", { newItems: newItems.length, total });
 
       if (newItems.length === 0 || currentSkip + newItems.length >= total) {
-        console.log("No more items to load, setting hasMore to false");
         setHasMore(false);
-      } else {
-        console.log("More items available, hasMore remains true");
       }
-    } catch (error) {
-      console.error("Error loading more items:", error);
+    } catch {
+      // Error handling
     }
   }, [items.rows.length, items.total, isLoading, hasMore, loadMore, take]);
 
   useEffect(() => {
-    const hiddenDiv = document.querySelector("[data-hidden-loader]");
+    const hiddenDiv = document.querySelector('[data-hidden-loader]');
     if (!hiddenDiv) return;
 
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
+      entries => {
+        entries.forEach(entry => {
           if (entry.isIntersecting && hasMore && !isLoading) {
             handleLoadMore();
           }
@@ -102,7 +86,7 @@ export const AsyncGenericList = <T,>({
       },
       {
         root: null,
-        rootMargin: "0px",
+        rootMargin: '0px',
         threshold: 0.1,
       }
     );
@@ -122,7 +106,7 @@ export const AsyncGenericList = <T,>({
     if (gridCols.md) classes.push(`md:grid-cols-${gridCols.md}`);
     if (gridCols.lg) classes.push(`lg:grid-cols-${gridCols.lg}`);
     if (gridCols.xl) classes.push(`xl:grid-cols-${gridCols.xl}`);
-    return classes.join(" ");
+    return classes.join(' ');
   };
 
   const showSkeleton = isLoading;

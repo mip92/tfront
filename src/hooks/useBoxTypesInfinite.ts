@@ -1,8 +1,8 @@
-import { useCallback, useMemo, useState } from "react";
-import { useGetBoxTypesQuery } from "@/generated/graphql";
+import { useCallback, useMemo, useState } from 'react';
+import { useGetBoxTypesQuery } from '@/generated/graphql';
 
 export type BoxTypeFromQuery = {
-  __typename?: "BoxType";
+  __typename?: 'BoxType';
   id: number;
   name: string;
   quantity: number;
@@ -29,11 +29,10 @@ export function useBoxTypesInfinite(searchTerm: string) {
         search: searchTerm || undefined,
       },
     },
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: 'cache-and-network',
   });
 
   const boxTypesData = useMemo(() => {
-    console.log("Box types data:", data);
     if (data?.boxTypesWithPagination) {
       return {
         rows: data.boxTypesWithPagination.rows.filter(Boolean),

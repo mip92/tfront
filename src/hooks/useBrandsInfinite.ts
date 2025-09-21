@@ -1,8 +1,8 @@
-import { useCallback, useMemo, useState } from "react";
-import { useGetBrandsQuery } from "@/generated/graphql";
+import { useCallback, useMemo, useState } from 'react';
+import { useGetBrandsQuery } from '@/generated/graphql';
 
 export type BrandFromQuery = {
-  __typename?: "Brand";
+  __typename?: 'Brand';
   id: number;
   name: string;
   createdAt: string;
@@ -27,11 +27,10 @@ export function useBrandsInfinite(searchTerm: string) {
         search: searchTerm || undefined,
       },
     },
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: 'cache-and-network',
   });
 
   const brandsData = useMemo(() => {
-    console.log("Brands data:", data);
     if (data?.brandsWithPagination) {
       return {
         rows: data.brandsWithPagination.rows.filter(Boolean),
@@ -46,7 +45,6 @@ export function useBrandsInfinite(searchTerm: string) {
       skip: number,
       take: number
     ): Promise<PaginationOutResponse<BrandFromQuery>> => {
-      console.log("Loading more brands, skip:", skip, "take:", take);
       setLoadingMore(true);
 
       try {
@@ -60,12 +58,9 @@ export function useBrandsInfinite(searchTerm: string) {
           },
         });
 
-        console.log("FetchMore result:", result);
-
         if (result.data?.brandsWithPagination?.rows) {
           const newBrands =
             result.data.brandsWithPagination.rows.filter(Boolean);
-          console.log("New brands loaded:", newBrands.length);
           return {
             rows: newBrands,
             total: result.data.brandsWithPagination.total || 0,
@@ -76,8 +71,7 @@ export function useBrandsInfinite(searchTerm: string) {
           rows: [],
           total: 0,
         };
-      } catch (error) {
-        console.error("Error loading more brands:", error);
+      } catch {
         return {
           rows: [],
           total: 0,
