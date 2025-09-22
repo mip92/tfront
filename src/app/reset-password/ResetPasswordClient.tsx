@@ -1,54 +1,54 @@
-"use client";
+'use client';
 
-import React, { useState, useMemo } from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { useResetPasswordMutation } from "@/generated/graphql";
-import { useAuth } from "@/contexts/AuthContext";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import React, { useState, useMemo } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import { useSetPasswordMutation } from '@/generated/graphql';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { AlertCircle, Loader2, Eye, EyeOff, CheckCircle } from "lucide-react";
-import { useSetBreadcrumbs } from "@/hooks/useSetBreadcrumbs";
-import Link from "next/link";
+} from '@/components/ui/card';
+import { AlertCircle, Loader2, Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { useSetBreadcrumbs } from '@/hooks/useSetBreadcrumbs';
+import Link from 'next/link';
 
 const resetPasswordSchema = yup.object({
   password: yup
     .string()
-    .min(6, "Password must be at least 6 characters")
-    .required("Password is required"),
+    .min(6, 'Password must be at least 6 characters')
+    .required('Password is required'),
   confirmPassword: yup
     .string()
-    .oneOf([yup.ref("password")], "Passwords must match")
-    .required("Please confirm your password"),
+    .oneOf([yup.ref('password')], 'Passwords must match')
+    .required('Please confirm your password'),
 });
 
 type ResetPasswordFormData = yup.InferType<typeof resetPasswordSchema>;
 
 export function ResetPasswordClient() {
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const token = searchParams.get("token");
+  const token = searchParams.get('token');
 
-  const [resetPasswordMutation, { loading }] = useResetPasswordMutation();
+  const [resetPasswordMutation, { loading }] = useSetPasswordMutation();
 
   const breadcrumbItems = useMemo(
     () => [
-      { label: "Reset Password", href: "/reset-password", isActive: true },
+      { label: 'Reset Password', href: '/reset-password', isActive: true },
     ],
     []
   );
@@ -65,39 +65,39 @@ export function ResetPasswordClient() {
 
   const onSubmit = async (data: ResetPasswordFormData) => {
     if (!token) {
-      setError("Invalid or missing reset token");
+      setError('Invalid or missing reset token');
       return;
     }
 
-    setError("");
+    setError('');
     setSuccess(false);
 
     try {
       const result = await resetPasswordMutation({
         variables: {
           input: {
-            newPassword: data.password,
+            password: data.password,
+            confirmPassword: data.confirmPassword,
           },
         },
       });
 
-      if (result.data?.resetPassword) {
+      if (result.data?.setPassword) {
         login(
-          result.data.resetPassword.access_token,
-          result.data.resetPassword.refresh_token,
-          result.data.resetPassword.user
+          result.data.setPassword.access_token,
+          result.data.setPassword.refresh_token
         );
         setSuccess(true);
         // Redirect to dashboard after 2 seconds
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push('/dashboard');
         }, 2000);
       }
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error
           ? err.message
-          : "An error occurred while resetting password";
+          : 'An error occurred while resetting password';
       setError(errorMessage);
     }
   };
@@ -163,10 +163,10 @@ export function ResetPasswordClient() {
             <div className="relative">
               <Input
                 id="password"
-                type={showPassword ? "text" : "password"}
+                type={showPassword ? 'text' : 'password'}
                 placeholder="Enter your new password"
-                {...register("password")}
-                className={`pr-12 ${errors.password ? "border-red-500" : ""}`}
+                {...register('password')}
+                className={`pr-12 ${errors.password ? 'border-red-500' : ''}`}
               />
               <button
                 type="button"
@@ -193,11 +193,11 @@ export function ResetPasswordClient() {
             <div className="relative">
               <Input
                 id="confirmPassword"
-                type={showConfirmPassword ? "text" : "password"}
+                type={showConfirmPassword ? 'text' : 'password'}
                 placeholder="Confirm your new password"
-                {...register("confirmPassword")}
+                {...register('confirmPassword')}
                 className={`pr-12 ${
-                  errors.confirmPassword ? "border-red-500" : ""
+                  errors.confirmPassword ? 'border-red-500' : ''
                 }`}
               />
               <button
@@ -234,14 +234,14 @@ export function ResetPasswordClient() {
                 Resetting password...
               </>
             ) : (
-              "Reset Password"
+              'Reset Password'
             )}
           </Button>
         </form>
 
         <div className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
           <p>
-            Remember your password?{" "}
+            Remember your password?{' '}
             <Link
               href="/auth"
               className="text-blue-600 hover:text-blue-500 dark:text-blue-400"

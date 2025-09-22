@@ -3,7 +3,6 @@
 import React, { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
 import {
   Stepper,
   StepperItem,
@@ -197,15 +196,7 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
                     className="flex flex-col items-center text-center"
                   >
                     <StepperTrigger>
-                      <StepperIndicator
-                        state={
-                          state.currentStep === progressStep.step
-                            ? 'active'
-                            : state.currentStep > progressStep.step
-                              ? 'completed'
-                              : 'inactive'
-                        }
-                      >
+                      <StepperIndicator step={progressStep.step}>
                         {state.currentStep === progressStep.step &&
                         state.isLoading ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
@@ -216,19 +207,15 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
                     </StepperTrigger>
                     <div className="mt-2">
                       <StepperTitle
-                        className={cn(
-                          'text-sm font-medium transition-colors',
-                          state.currentStep === progressStep.step
-                            ? 'text-primary font-semibold'
-                            : 'text-muted-foreground'
-                        )}
+                        step={progressStep.step}
+                        className="text-sm font-medium"
                       >
                         {progressStep.title}
                       </StepperTitle>
                     </div>
                     {index < progressSteps.length - 1 && (
                       <StepperSeparator
-                        isCompleted={state.currentStep > progressStep.step}
+                        step={progressStep.step}
                         className="mt-4"
                       />
                     )}
@@ -245,15 +232,7 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
                 <React.Fragment key={progressStep.step}>
                   <StepperItem step={progressStep.step}>
                     <StepperTrigger>
-                      <StepperIndicator
-                        state={
-                          state.currentStep === progressStep.step
-                            ? 'active'
-                            : state.currentStep > progressStep.step
-                              ? 'completed'
-                              : 'inactive'
-                        }
-                      >
+                      <StepperIndicator step={progressStep.step}>
                         {state.currentStep === progressStep.step &&
                         state.isLoading ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
@@ -263,32 +242,19 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
                       </StepperIndicator>
                       <div className="flex flex-col items-start">
                         <StepperTitle
-                          className={cn(
-                            'transition-colors',
-                            state.currentStep === progressStep.step
-                              ? 'text-primary font-semibold'
-                              : 'text-foreground'
-                          )}
+                          step={progressStep.step}
+                          className="font-semibold"
                         >
                           {progressStep.title}
                         </StepperTitle>
-                        <StepperDescription
-                          className={cn(
-                            'transition-colors',
-                            state.currentStep === progressStep.step
-                              ? 'text-primary/80'
-                              : 'text-muted-foreground'
-                          )}
-                        >
+                        <StepperDescription step={progressStep.step}>
                           {progressStep.description}
                         </StepperDescription>
                       </div>
                     </StepperTrigger>
                   </StepperItem>
                   {index < progressSteps.length - 1 && (
-                    <StepperSeparator
-                      isCompleted={state.currentStep > progressStep.step}
-                    />
+                    <StepperSeparator step={progressStep.step} />
                   )}
                 </React.Fragment>
               ))}

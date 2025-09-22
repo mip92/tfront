@@ -2,23 +2,19 @@
 
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { Check } from 'lucide-react';
 
+// Context for stepper state
 interface StepperContextValue {
   currentStep: number;
-  orientation: 'horizontal' | 'vertical';
-  totalSteps: number;
-  isNextDisabled: boolean;
-  isPrevDisabled: boolean;
+  steps: StepperStep[];
+  registerStep: (step: StepperStep) => void;
+  goToStep: (step: number) => void;
   nextStep: () => void;
   prevStep: () => void;
-  goToStep: (step: number) => void;
-  canGoToStep: (step: number) => boolean;
+  orientation: 'horizontal' | 'vertical';
 }
 
-const StepperContext = React.createContext<StepperContextValue | undefined>(
-  undefined
-);
+const StepperContext = React.createContext<StepperContextValue | null>(null);
 
 const useStepper = () => {
   const context = React.useContext(StepperContext);
@@ -28,103 +24,133 @@ const useStepper = () => {
   return context;
 };
 
-interface StepperProps {
-  currentStep: number;
-  orientation?: 'horizontal' | 'vertical';
-  children: React.ReactNode;
-  className?: string;
-  onStepChange?: (step: number) => void;
-  canGoToStep?: (step: number) => boolean;
+// Types
+interface StepperStep {
+  step: number;
+  title: string;
+  description?: string;
+  completed?: boolean;
+  disabled?: boolean;
 }
 
+interface StepperProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+  orientation?: 'horizontal' | 'vertical';
+  currentStep?: number;
+}
+
+interface StepperItemProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+  step: number;
+  onClick?: () => void;
+  disabled?: boolean;
+}
+
+interface StepperIndicatorProps extends React.HTMLAttributes<HTMLDivElement> {
+  step?: number;
+  completed?: boolean;
+  current?: boolean;
+}
+
+interface StepperTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
+  children: React.ReactNode;
+  step?: number;
+}
+
+interface StepperDescriptionProps
+  extends React.HTMLAttributes<HTMLParagraphElement> {
+  children: React.ReactNode;
+  step?: number;
+}
+
+interface StepperSeparatorProps extends React.HTMLAttributes<HTMLDivElement> {
+  step?: number;
+  completed?: boolean;
+}
+
+interface StepperTriggerProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  children: React.ReactNode;
+  onClick?: () => void;
+}
+
+// Main Stepper Component
 const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(
   (
     {
-      currentStep,
-      orientation = 'horizontal',
       children,
       className,
-      onStepChange,
-      canGoToStep = () => true,
+      orientation = 'horizontal',
+      currentStep: externalCurrentStep,
       ...props
     },
     ref
   ) => {
-    const [internalStep, setInternalStep] = React.useState(currentStep);
-    const totalSteps = React.Children.count(children);
+    const [internalCurrentStep, setInternalCurrentStep] = React.useState(1);
+    const [steps, setSteps] = React.useState<StepperStep[]>([]);
 
-    const step = onStepChange ? currentStep : internalStep;
+    // Use external currentStep if provided, otherwise use internal state
+    const currentStep = externalCurrentStep ?? internalCurrentStep;
 
-    const nextStep = React.useCallback(() => {
-      const newStep = Math.min(step + 1, totalSteps);
-      if (onStepChange) {
-        onStepChange(newStep);
-      } else {
-        setInternalStep(newStep);
-      }
-    }, [step, totalSteps, onStepChange]);
-
-    const prevStep = React.useCallback(() => {
-      const newStep = Math.max(step - 1, 1);
-      if (onStepChange) {
-        onStepChange(newStep);
-      } else {
-        setInternalStep(newStep);
-      }
-    }, [step, onStepChange]);
+    const registerStep = React.useCallback((step: StepperStep) => {
+      setSteps(prev => {
+        const existing = prev.find(s => s.step === step.step);
+        if (existing) {
+          return prev.map(s => (s.step === step.step ? step : s));
+        }
+        return [...prev, step].sort((a, b) => a.step - b.step);
+      });
+    }, []);
 
     const goToStep = React.useCallback(
-      (targetStep: number) => {
-        if (
-          canGoToStep(targetStep) &&
-          targetStep >= 1 &&
-          targetStep <= totalSteps
-        ) {
-          if (onStepChange) {
-            onStepChange(targetStep);
-          } else {
-            setInternalStep(targetStep);
-          }
+      (step: number) => {
+        if (externalCurrentStep === undefined) {
+          setInternalCurrentStep(step);
         }
       },
-      [canGoToStep, totalSteps, onStepChange]
+      [externalCurrentStep]
     );
 
-    const isNextDisabled = step >= totalSteps;
-    const isPrevDisabled = step <= 1;
+    const nextStep = React.useCallback(() => {
+      if (externalCurrentStep === undefined) {
+        setInternalCurrentStep(prev => Math.min(prev + 1, steps.length));
+      }
+    }, [externalCurrentStep, steps.length]);
 
-    const contextValue = React.useMemo(
+    const prevStep = React.useCallback(() => {
+      if (externalCurrentStep === undefined) {
+        setInternalCurrentStep(prev => Math.max(prev - 1, 1));
+      }
+    }, [externalCurrentStep]);
+
+    const value = React.useMemo(
       () => ({
-        currentStep: step,
-        orientation,
-        totalSteps,
-        isNextDisabled,
-        isPrevDisabled,
+        currentStep,
+        steps,
+        registerStep,
+        goToStep,
         nextStep,
         prevStep,
-        goToStep,
-        canGoToStep,
+        orientation,
       }),
       [
-        step,
-        orientation,
-        totalSteps,
-        isNextDisabled,
-        isPrevDisabled,
+        currentStep,
+        steps,
+        registerStep,
+        goToStep,
         nextStep,
         prevStep,
-        goToStep,
-        canGoToStep,
+        orientation,
       ]
     );
 
     return (
-      <StepperContext.Provider value={contextValue}>
+      <StepperContext.Provider value={value}>
         <div
           ref={ref}
           className={cn(
             'flex',
-            orientation === 'vertical' ? 'flex-col' : 'flex-row',
+            orientation === 'horizontal' ? 'flex-row' : 'flex-col',
             className
           )}
           {...props}
@@ -137,28 +163,22 @@ const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(
 );
 Stepper.displayName = 'Stepper';
 
-interface StepperItemProps {
-  step: number;
-  children: React.ReactNode;
-  className?: string;
-  onClick?: () => void;
-}
-
+// Stepper Item Component
 const StepperItem = React.forwardRef<HTMLDivElement, StepperItemProps>(
-  ({ step, children, className, onClick, ...props }, ref) => {
-    const { currentStep, orientation, goToStep, canGoToStep } = useStepper();
+  ({ children, step, onClick, disabled = false, className, ...props }, ref) => {
+    const { currentStep, goToStep, orientation } = useStepper();
+
     const isCompleted = currentStep > step;
     const isCurrent = currentStep === step;
-    const isInactive = currentStep < step;
-
-    const state = isCompleted ? 'completed' : isCurrent ? 'active' : 'inactive';
-    const canNavigate = canGoToStep(step);
+    const canNavigate = !disabled && (isCompleted || isCurrent);
 
     const handleClick = () => {
-      if (canNavigate && onClick) {
-        onClick();
-      } else if (canNavigate) {
-        goToStep(step);
+      if (canNavigate) {
+        if (onClick) {
+          onClick();
+        } else {
+          goToStep(step);
+        }
       }
     };
 
@@ -172,82 +192,156 @@ const StepperItem = React.forwardRef<HTMLDivElement, StepperItemProps>(
           className
         )}
         onClick={handleClick}
-        data-state={state}
+        data-state={
+          isCompleted ? 'completed' : isCurrent ? 'active' : 'inactive'
+        }
         {...props}
       >
-        {React.Children.map(children, child => {
-          if (React.isValidElement(child)) {
-            // Only pass stepper-specific props to stepper components
-            const isStepperComponent =
-              child.type === StepperTrigger ||
-              child.type === StepperIndicator ||
-              child.type === StepperTitle ||
-              child.type === StepperDescription ||
-              child.type === StepperSeparator;
-
-            if (isStepperComponent) {
-              return React.cloneElement(child, {
-                state,
-                isCompleted,
-                isCurrent,
-                isInactive,
-                canNavigate,
-              });
-            }
-          }
-          return child;
-        })}
+        {children}
       </div>
     );
   }
 );
 StepperItem.displayName = 'StepperItem';
 
-interface StepperTriggerProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  children: React.ReactNode;
-  className?: string;
-  onClick?: () => void;
-  asChild?: boolean;
-  isCompleted?: boolean;
-  isCurrent?: boolean;
-  isInactive?: boolean;
-  canNavigate?: boolean;
-  state?: string;
-}
+// Stepper Indicator Component
+const StepperIndicator = React.forwardRef<
+  HTMLDivElement,
+  StepperIndicatorProps
+>(({ step, completed, current, className, ...props }, ref) => {
+  const { currentStep } = useStepper();
 
+  // Use props if provided, otherwise calculate from context
+  const isCompleted =
+    completed !== undefined ? completed : step ? currentStep > step : false;
+  const isCurrent =
+    current !== undefined ? current : step ? currentStep === step : false;
+
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        'flex items-center justify-center w-8 h-8 min-w-8 min-h-8 border-2 transition-colors rounded-full',
+        isCompleted
+          ? 'bg-foreground border-foreground text-background'
+          : isCurrent
+            ? 'bg-background border-foreground text-foreground'
+            : 'bg-muted border-muted-foreground text-muted-foreground',
+        className
+      )}
+      {...props}
+    >
+      {isCompleted ? (
+        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fillRule="evenodd"
+            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+            clipRule="evenodd"
+          />
+        </svg>
+      ) : (
+        <span className="text-sm font-medium">{step}</span>
+      )}
+    </div>
+  );
+});
+StepperIndicator.displayName = 'StepperIndicator';
+
+// Stepper Title Component
+const StepperTitle = React.forwardRef<HTMLHeadingElement, StepperTitleProps>(
+  ({ children, step, className, ...props }, ref) => {
+    const { currentStep } = useStepper();
+
+    const isCompleted = step ? currentStep > step : false;
+    const isCurrent = step ? currentStep === step : false;
+
+    return (
+      <h3
+        ref={ref}
+        className={cn(
+          'text-sm font-medium transition-colors',
+          isCompleted
+            ? 'text-foreground font-semibold'
+            : isCurrent
+              ? 'text-foreground font-semibold'
+              : 'text-muted-foreground',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </h3>
+    );
+  }
+);
+StepperTitle.displayName = 'StepperTitle';
+
+// Stepper Description Component
+const StepperDescription = React.forwardRef<
+  HTMLParagraphElement,
+  StepperDescriptionProps
+>(({ children, step, className, ...props }, ref) => {
+  const { currentStep } = useStepper();
+
+  const isCompleted = step ? currentStep > step : false;
+  const isCurrent = step ? currentStep === step : false;
+
+  return (
+    <p
+      ref={ref}
+      className={cn(
+        'text-xs transition-colors',
+        isCompleted
+          ? 'text-muted-foreground'
+          : isCurrent
+            ? 'text-muted-foreground'
+            : 'text-muted-foreground/60',
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </p>
+  );
+});
+StepperDescription.displayName = 'StepperDescription';
+
+// Stepper Separator Component
+const StepperSeparator = React.forwardRef<
+  HTMLDivElement,
+  StepperSeparatorProps
+>(({ step, completed = false, className, ...props }, ref) => {
+  const { currentStep, orientation } = useStepper();
+
+  const isCompleted = completed ?? (step ? currentStep > step : false);
+
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        'bg-border',
+        orientation === 'horizontal' ? 'h-px flex-1 mx-4' : 'w-px h-4 my-2',
+        isCompleted ? 'bg-foreground' : 'bg-border',
+        className
+      )}
+      {...props}
+    />
+  );
+});
+StepperSeparator.displayName = 'StepperSeparator';
+
+// Stepper Trigger Component
 const StepperTrigger = React.forwardRef<HTMLButtonElement, StepperTriggerProps>(
-  ({ children, className, onClick, asChild = false, ...props }, ref) => {
-    // Extract non-DOM props to avoid passing them to DOM elements
-    const { ...domProps } = props;
-
-    if (asChild) {
-      const child = children as React.ReactElement;
-      return React.cloneElement(child, {
-        ...domProps,
-        ref,
-        className: cn(
-          'flex items-center gap-3 text-left transition-colors hover:text-foreground',
-          className,
-          child.props?.className
-        ),
-        onClick: (e: React.MouseEvent) => {
-          onClick?.();
-          child.props?.onClick?.(e);
-        },
-      });
-    }
-
+  ({ children, className, onClick, ...props }, ref) => {
     return (
       <button
         ref={ref}
-        type="button"
         className={cn(
           'flex items-center gap-3 text-left transition-colors hover:text-foreground',
           className
         )}
         onClick={onClick}
-        {...domProps}
+        {...props}
       >
         {children}
       </button>
@@ -256,138 +350,13 @@ const StepperTrigger = React.forwardRef<HTMLButtonElement, StepperTriggerProps>(
 );
 StepperTrigger.displayName = 'StepperTrigger';
 
-interface StepperIndicatorProps {
-  children?: React.ReactNode;
-  className?: string;
-  state?: 'completed' | 'active' | 'inactive';
-  isCompleted?: boolean;
-  isCurrent?: boolean;
-  isInactive?: boolean;
-  canNavigate?: boolean;
-}
-
-const StepperIndicator = React.forwardRef<
-  HTMLDivElement,
-  StepperIndicatorProps
->(
-  (
-    {
-      children,
-      className,
-      state,
-      isCompleted,
-      isCurrent,
-      canNavigate = true,
-      ...props
-    },
-    ref
-  ) => {
-    // Use props if provided, otherwise calculate from context
-    const completed = isCompleted ?? state === 'completed';
-    const current = isCurrent ?? state === 'active';
-
-    return (
-      <div
-        ref={ref}
-        className={cn(
-          'flex h-8 w-8 items-center justify-center rounded-full border-2 text-sm font-medium transition-all duration-200 aspect-square',
-          completed
-            ? 'border-primary bg-primary text-primary-foreground shadow-lg'
-            : current
-              ? 'border-primary bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/20'
-              : 'border-muted bg-background text-muted-foreground hover:border-muted-foreground',
-          !canNavigate && 'opacity-50',
-          className
-        )}
-        {...props}
-      >
-        {completed ? <Check className="h-4 w-4" /> : children}
-      </div>
-    );
-  }
-);
-StepperIndicator.displayName = 'StepperIndicator';
-
-interface StepperTitleProps {
-  children: React.ReactNode;
-  className?: string;
-}
-
-const StepperTitle = React.forwardRef<HTMLDivElement, StepperTitleProps>(
-  ({ children, className, ...props }, ref) => {
-    return (
-      <div
-        ref={ref}
-        className={cn('font-medium text-foreground', className)}
-        {...props}
-      >
-        {children}
-      </div>
-    );
-  }
-);
-StepperTitle.displayName = 'StepperTitle';
-
-interface StepperDescriptionProps {
-  children: React.ReactNode;
-  className?: string;
-}
-
-const StepperDescription = React.forwardRef<
-  HTMLDivElement,
-  StepperDescriptionProps
->(({ children, className, ...props }, ref) => {
-  return (
-    <div
-      ref={ref}
-      className={cn('text-sm text-muted-foreground', className)}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-});
-StepperDescription.displayName = 'StepperDescription';
-
-interface StepperSeparatorProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string;
-  isCompleted?: boolean;
-  isCurrent?: boolean;
-  isInactive?: boolean;
-  canNavigate?: boolean;
-  state?: 'active' | 'completed' | 'inactive';
-}
-
-const StepperSeparator = React.forwardRef<
-  HTMLDivElement,
-  StepperSeparatorProps
->(({ className, isCompleted = false, ...props }, ref) => {
-  const { orientation } = useStepper();
-
-  // Extract non-DOM props to avoid passing them to DOM
-  const { isCompleted, ...domProps } = props;
-
-  return (
-    <div
-      ref={ref}
-      className={cn(
-        'bg-border',
-        orientation === 'vertical' ? 'h-8 w-px' : 'h-px flex-1',
-        isCompleted ? 'bg-primary' : 'bg-border',
-        className
-      )}
-      {...domProps}
-    />
-  );
-});
-StepperSeparator.displayName = 'StepperSeparator';
-
 export {
   Stepper,
   StepperItem,
-  StepperTrigger,
   StepperIndicator,
   StepperTitle,
   StepperDescription,
   StepperSeparator,
+  StepperTrigger,
+  useStepper,
 };
