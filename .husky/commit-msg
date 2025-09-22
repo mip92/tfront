@@ -1,0 +1,15 @@
+echo "📝 Checking commit message..."
+
+# Check if commit message is not empty
+if [ -z "$(cat $1)" ]; then
+  echo "❌ Commit message cannot be empty!"
+  exit 1
+fi
+
+# Check if commit message is too short
+if [ ${#1} -lt 10 ]; then
+  echo "❌ Commit message should be at least 10 characters long!"
+  exit 1
+fi
+
+echo "✅ Commit message looks good!"

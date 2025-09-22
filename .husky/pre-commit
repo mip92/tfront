@@ -1,1 +1,19 @@
-npx lint-staged
+echo "🔍 Running pre-commit checks..."
+
+# Run linting
+echo "📝 Running ESLint..."
+npm run lint
+
+# Check TypeScript compilation
+echo "🔧 Checking TypeScript compilation..."
+npm run type-check
+
+# Run build check (only if there are changes in src/ or package.json)
+if git diff --cached --name-only | grep -E '\.(ts|tsx|js|jsx|json)$' | grep -E '^(src/|package\.json)'; then
+  echo "🏗️  Running build check..."
+  npm run build:check
+else
+  echo "⏭️  Skipping build check (no relevant changes)"
+fi
+
+echo "✅ All checks passed! Commit allowed."

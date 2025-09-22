@@ -8,9 +8,11 @@
     "start": "next start",
     "lint": "eslint",
     "build:docker": "next build",
+    "build:check": "next build",
+    "type-check": "tsc --noEmit",
     "codegen": "graphql-codegen --config graphql.config.ts",
     "codegen:watch": "graphql-codegen --config graphql.config.ts --watch",
-    "prepare": "husky || true"
+    "prepare": "husky"
   },
   "dependencies": {
     "@apollo/client": "^3.14.0",
