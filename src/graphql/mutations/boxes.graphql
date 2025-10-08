@@ -1,0 +1,38 @@
+mutation CreateBox($input: BoxInput!) {
+  createBox(input: $input) {
+    id
+    name
+    description
+    parentBoxId
+    boxTypeId
+    createdAt
+    updatedAt
+  }
+}
+
+mutation UpdateBox($id: Int!, $input: BoxUpdateInput!) {
+  updateBox(id: $id, input: $input) {
+    id
+    name
+    description
+    parentBoxId
+    boxTypeId
+    createdAt
+    updatedAt
+  }
+}
+
+mutation RemoveBox($id: Int!) {
+  removeBox(id: $id) {
+    id
+    name
+    description
+    parentBoxId
+    boxTypeId
+    createdAt
+    updatedAt
+  }
+}
+
+
+

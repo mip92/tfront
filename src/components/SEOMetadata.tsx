@@ -207,4 +207,21 @@ export const pageSEO = {
       ],
       canonical: "/box-types",
     }),
+
+  warehouse: () =>
+    generateSEOMetadata({
+      title: "Warehouse Management - Box Visualization & Inventory",
+      description:
+        "Visualize and manage your warehouse boxes and their hierarchical structure. Interactive box tree with expandable content and inventory management.",
+      keywords: [
+        "warehouse",
+        "boxes",
+        "inventory",
+        "management",
+        "visualization",
+        "hierarchy",
+        "storage",
+      ],
+      canonical: "/warehouse",
+    }),
 };

@@ -34,7 +34,6 @@ mutation ForgotPassword($input: ForgotPasswordInput!) {
 
 # Multi-step registration mutations
 # Note: These mutations will be added when the backend supports them
-# For now, we'll use mock responses in the frontend
 
 mutation StartRegistration($input: StartRegistrationInput!) {
   startRegistration(input: $input) {

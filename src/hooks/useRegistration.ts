@@ -299,22 +299,8 @@ export const useRegistration = (onComplete?: () => void) => {
     setState(prev => ({ ...prev, isLoading: true, error: undefined }));
 
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Mock response
-      const response: GoBackStepResponse = {
-        message: 'Moved back successfully',
-        step: Math.max(1, state.currentStep - 1) as RegistrationStep,
-      };
-
-      setState(prev => ({
-        ...prev,
-        currentStep: response.step as RegistrationStep,
-        isLoading: false,
-      }));
-
-      return response;
+      // TODO: Implement real API call when backend supports it
+      throw new Error('Go back functionality not implemented yet');
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Failed to go back step';

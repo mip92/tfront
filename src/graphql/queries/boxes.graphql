@@ -1,0 +1,119 @@
+# Note: This query will be added when backend supports paginated boxes
+# query GetBoxes($query: BoxesQueryDto!) {
+#   getAllBoxes(query: $query) {
+#     rows {
+#       id
+#       name
+#       description
+#       parentBoxId
+#       boxTypeId
+#       createdAt
+#       updatedAt
+#     }
+#     total
+#   }
+# }
+
+query GetRootBoxes {
+  rootBoxes {
+    id
+    name
+    description
+    parentBoxId
+    boxTypeId
+    createdAt
+    updatedAt
+    childBoxesCount
+    inventoryItems {
+      id
+      quantity
+      product {
+        id
+        name
+      }
+    }
+  }
+}
+
+query GetChildBoxes($parentBoxId: Int!) {
+  childBoxes(parentBoxId: $parentBoxId) {
+    id
+    name
+    description
+    parentBoxId
+    boxTypeId
+    createdAt
+    updatedAt
+    childBoxesCount
+    inventoryItems {
+      id
+      quantity
+      product {
+        id
+        name
+      }
+    }
+  }
+}
+
+# Note: This query will be added when backend supports box hierarchy
+# query GetBoxHierarchy($boxId: Int!) {
+#   boxHierarchy(boxId: $boxId) {
+#     id
+#     name
+#     description
+#     parentBoxId
+#     boxTypeId
+#     createdAt
+#     updatedAt
+#     boxType {
+#       id
+#       name
+#       type
+#       quantity
+#     }
+#     parentBox {
+#       id
+#       name
+#       description
+#     }
+#     childBoxes {
+#       id
+#       name
+#       description
+#       parentBoxId
+#       boxTypeId
+#     }
+#   }
+# }
+
+# Note: This query will be added when backend supports single box details
+# query GetOneBox($id: Int!) {
+#   getOneBox(id: $id) {
+#     id
+#     name
+#     description
+#     parentBoxId
+#     boxTypeId
+#     createdAt
+#     updatedAt
+#     boxType {
+#       id
+#       name
+#       type
+#       quantity
+#     }
+#     parentBox {
+#       id
+#       name
+#       description
+#     }
+#     childBoxes {
+#       id
+#       name
+#       description
+#       parentBoxId
+#       boxTypeId
+#     }
+#   }
+# }

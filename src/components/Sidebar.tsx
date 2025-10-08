@@ -18,6 +18,7 @@ import {
   ChevronRight,
   Package,
   Tag,
+  Warehouse,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -53,6 +54,12 @@ const navigationItems: NavigationItem[] = [
   { href: '/products', label: 'Products', icon: Package, requiresAuth: true },
   { href: '/brands', label: 'Brands', icon: Tag, requiresAuth: true },
   { href: '/box-types', label: 'Box Types', icon: Package, requiresAuth: true },
+  {
+    href: '/warehouse',
+    label: 'Warehouse',
+    icon: Warehouse,
+    requiresAuth: true,
+  },
 ];
 
 export default function Sidebar({
@@ -77,7 +84,7 @@ export default function Sidebar({
     <div className="flex flex-col h-full relative">
       {/* Logo */}
       <div
-        className={`${
+        className={`sidebar-logo border-b-0 ${
           isCollapsed ? 'h-14 px-3' : 'h-14 px-4 sm:px-6 lg:px-8'
         } flex items-center bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700`}
       >
@@ -207,7 +214,7 @@ export default function Sidebar({
   return (
     <>
       <div
-        className={`hidden md:flex md:flex-col md:fixed md:inset-y-0 md:z-[70] transition-all duration-300 ${
+        className={`hidden md:flex md:flex-col md:fixed md:top-0 md:bottom-0 md:left-0 md:z-[70] transition-all duration-300 ${
           isCollapsed ? 'md:w-16' : 'md:w-64'
         }`}
       >

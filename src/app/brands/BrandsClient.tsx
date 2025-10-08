@@ -1,25 +1,25 @@
-"use client";
+'use client';
 
-import React, { useState, useCallback, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Plus, Search, Filter, Tag, Loader2 } from "lucide-react";
-import { AsyncGenericList } from "@/components/AsyncGenericList";
-import { ProductSkeleton } from "@/components/ProductSkeleton";
-import Link from "next/link";
+import React, { useState, useCallback, useMemo } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Plus, Search, Filter, Tag, Loader2 } from 'lucide-react';
+import { AsyncGenericList } from '@/components/AsyncGenericList';
+import { ProductSkeleton } from '@/components/ProductSkeleton';
+import Link from 'next/link';
 import {
   useBrandsInfinite,
   type BrandFromQuery,
-} from "@/hooks/useBrandsInfinite";
-import { useSetBreadcrumbs } from "@/hooks/useSetBreadcrumbs";
+} from '@/hooks/useBrandsInfinite';
+import { useSetBreadcrumbs } from '@/hooks/useSetBreadcrumbs';
 
 export function BrandsClient() {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const { brandsData, loadMore, loading, loadingMore, error, refetch, take } =
     useBrandsInfinite(searchTerm);
 
   const breadcrumbItems = useMemo(
-    () => [{ label: "Brands", href: "/brands", isActive: true }],
+    () => [{ label: 'Brands', href: '/brands', isActive: true }],
     []
   );
 
@@ -81,28 +81,31 @@ export function BrandsClient() {
   return (
     <>
       {/* Actions Bar */}
-      <section className="mb-6 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between px-2">
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Search brands..."
-              value={searchTerm}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              aria-label="Search brands"
-            />
-          </div>
-          <Button variant="outline" size="sm">
+      <section className="mb-6 px-2">
+        {/* Search Field - Full Width */}
+        <div className="relative mb-4">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search brands..."
+            value={searchTerm}
+            onChange={e => handleSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            aria-label="Search brands"
+          />
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+          <Button variant="outline" size="sm" className="sm:w-auto w-full">
             <Filter className="h-4 w-4 mr-2" />
             Filter
           </Button>
+          <Button size="sm" className="sm:w-auto w-full">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Brand
+          </Button>
         </div>
-        <Button size="sm">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Brand
-        </Button>
       </section>
 
       {/* Loading State */}
@@ -147,7 +150,7 @@ export function BrandsClient() {
           <p className="text-muted-foreground mb-4">
             {searchTerm
               ? `No brands match "${searchTerm}"`
-              : "Get started by adding your first brand"}
+              : 'Get started by adding your first brand'}
           </p>
           <Button>
             <Plus className="h-4 w-4 mr-2" />

@@ -28,12 +28,26 @@ export type AuthResponse = {
 export type Box = {
   __typename?: 'Box';
   boxTypeId?: Maybe<Scalars['Int']['output']>;
+  childBoxes: Array<Box>;
+  childBoxesCount: Scalars['Int']['output'];
   createdAt: Scalars['DateTime']['output'];
   description?: Maybe<Scalars['String']['output']>;
   id: Scalars['Int']['output'];
+  inventoryItems: Array<InventoryItem>;
   name?: Maybe<Scalars['String']['output']>;
+  parentBox?: Maybe<Box>;
   parentBoxId?: Maybe<Scalars['Int']['output']>;
   updatedAt: Scalars['DateTime']['output'];
+};
+
+export type BoxInput = {
+  boxTypeId?: InputMaybe<Scalars['Int']['input']>;
+  description: Scalars['String']['input'];
+  imageUrl?: InputMaybe<Scalars['String']['input']>;
+  isActive?: Scalars['Boolean']['input'];
+  name: Scalars['String']['input'];
+  parentBoxId?: InputMaybe<Scalars['Int']['input']>;
+  quantity?: Scalars['Int']['input'];
 };
 
 export type BoxType = {
@@ -75,6 +89,32 @@ export type BoxTypesQueryDto = {
   sortBy?: InputMaybe<BoxTypeSortField>;
   sortOrder?: InputMaybe<SortOrder>;
   take?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type BoxUpdateInput = {
+  boxTypeId?: InputMaybe<Scalars['Int']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  imageUrl?: InputMaybe<Scalars['String']['input']>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  parentBoxId?: InputMaybe<Scalars['Int']['input']>;
+  quantity?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type BoxWithBoxType = {
+  __typename?: 'BoxWithBoxType';
+  boxType?: Maybe<BoxType>;
+  boxTypeId?: Maybe<Scalars['Int']['output']>;
+  childBoxes: Array<Box>;
+  childBoxesCount: Scalars['Int']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['Int']['output'];
+  inventoryItems: Array<InventoryItem>;
+  name?: Maybe<Scalars['String']['output']>;
+  parentBox?: Maybe<Box>;
+  parentBoxId?: Maybe<Scalars['Int']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
 };
 
 export type Brand = {
@@ -137,6 +177,22 @@ export type GoBackStepInput = {
   userId: Scalars['Float']['input'];
 };
 
+export type InventoryItem = {
+  __typename?: 'InventoryItem';
+  boxId?: Maybe<Scalars['Int']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  date?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  notes?: Maybe<Scalars['String']['output']>;
+  product: Product;
+  productId: Scalars['Int']['output'];
+  purchasePrice: Scalars['Int']['output'];
+  quantity: Scalars['Int']['output'];
+  status?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
 export type LoginInput = {
   email?: InputMaybe<Scalars['String']['input']>;
   password: Scalars['String']['input'];
@@ -152,6 +208,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   assignRole: User;
   assignRoleToUser: Role;
+  createBox: Box;
   createBoxType: BoxType;
   createBrand: Brand;
   createProduct: ProductWithBrand;
@@ -167,12 +224,14 @@ export type Mutation = {
   login: AuthResponse;
   logout: Scalars['String']['output'];
   refreshToken: AuthResponse;
+  removeBox: Box;
   removeRole: User;
   removeRoleFromUser: Role;
   resendCode: ResendCodeResponse;
   setPassword: SetPasswordResponse;
   setPersonalInfo: SetPersonalInfoResponse;
   startRegistration: StartRegistrationResponse;
+  updateBox: Box;
   updateBoxType: BoxType;
   updateBrand: Brand;
   updateProduct: ProductWithBrand;
@@ -191,6 +250,11 @@ export type MutationAssignRoleArgs = {
 export type MutationAssignRoleToUserArgs = {
   roleId: Scalars['Int']['input'];
   userId: Scalars['Int']['input'];
+};
+
+
+export type MutationCreateBoxArgs = {
+  input: BoxInput;
 };
 
 
@@ -259,6 +323,11 @@ export type MutationLoginArgs = {
 };
 
 
+export type MutationRemoveBoxArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
 export type MutationRemoveRoleArgs = {
   userId: Scalars['Int']['input'];
 };
@@ -287,6 +356,12 @@ export type MutationSetPersonalInfoArgs = {
 
 export type MutationStartRegistrationArgs = {
   input: StartRegistrationInput;
+};
+
+
+export type MutationUpdateBoxArgs = {
+  id: Scalars['Int']['input'];
+  input: BoxUpdateInput;
 };
 
 
@@ -422,12 +497,15 @@ export type Query = {
   boxTypesWithPagination: PaginatedBoxTypesResponse;
   brand: Brand;
   brandsWithPagination: PaginatedBrandsResponse;
+  childBoxes: Array<Box>;
+  getOneBox: BoxWithBoxType;
   getProfile: UserAuth;
   product: ProductWithBrand;
   productsWithPagination: PaginatedProductsResponse;
   role?: Maybe<Role>;
   roleByName?: Maybe<Role>;
   roles?: Maybe<Array<Role>>;
+  rootBoxes: Array<Box>;
   user?: Maybe<User>;
   users: Array<User>;
 };
@@ -450,6 +528,16 @@ export type QueryBrandArgs = {
 
 export type QueryBrandsWithPaginationArgs = {
   query: BrandsQueryDto;
+};
+
+
+export type QueryChildBoxesArgs = {
+  parentBoxId: Scalars['Int']['input'];
+};
+
+
+export type QueryGetOneBoxArgs = {
+  id: Scalars['Int']['input'];
 };
 
 
@@ -697,6 +785,28 @@ export type GoBackStepMutationVariables = Exact<{
 
 export type GoBackStepMutation = { __typename?: 'Mutation', goBackStep: { __typename?: 'MessageResponse', message: string } };
 
+export type CreateBoxMutationVariables = Exact<{
+  input: BoxInput;
+}>;
+
+
+export type CreateBoxMutation = { __typename?: 'Mutation', createBox: { __typename?: 'Box', id: number, name?: string | null, description?: string | null, parentBoxId?: number | null, boxTypeId?: number | null, createdAt: string, updatedAt: string } };
+
+export type UpdateBoxMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+  input: BoxUpdateInput;
+}>;
+
+
+export type UpdateBoxMutation = { __typename?: 'Mutation', updateBox: { __typename?: 'Box', id: number, name?: string | null, description?: string | null, parentBoxId?: number | null, boxTypeId?: number | null, createdAt: string, updatedAt: string } };
+
+export type RemoveBoxMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+
+export type RemoveBoxMutation = { __typename?: 'Mutation', removeBox: { __typename?: 'Box', id: number, name?: string | null, description?: string | null, parentBoxId?: number | null, boxTypeId?: number | null, createdAt: string, updatedAt: string } };
+
 export type GetBoxTypeQueryVariables = Exact<{
   id: Scalars['Int']['input'];
 }>;
@@ -710,6 +820,18 @@ export type GetBoxTypesQueryVariables = Exact<{
 
 
 export type GetBoxTypesQuery = { __typename?: 'Query', boxTypesWithPagination: { __typename?: 'PaginatedBoxTypesResponse', total: number, rows: Array<{ __typename?: 'BoxType', id: number, name: string, quantity: number, type: string, createdAt: string, updatedAt: string }> } };
+
+export type GetRootBoxesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetRootBoxesQuery = { __typename?: 'Query', rootBoxes: Array<{ __typename?: 'Box', id: number, name?: string | null, description?: string | null, parentBoxId?: number | null, boxTypeId?: number | null, createdAt: string, updatedAt: string, childBoxesCount: number, inventoryItems: Array<{ __typename?: 'InventoryItem', id: number, quantity: number, product: { __typename?: 'Product', id: number, name: string } }> }> };
+
+export type GetChildBoxesQueryVariables = Exact<{
+  parentBoxId: Scalars['Int']['input'];
+}>;
+
+
+export type GetChildBoxesQuery = { __typename?: 'Query', childBoxes: Array<{ __typename?: 'Box', id: number, name?: string | null, description?: string | null, parentBoxId?: number | null, boxTypeId?: number | null, createdAt: string, updatedAt: string, childBoxesCount: number, inventoryItems: Array<{ __typename?: 'InventoryItem', id: number, quantity: number, product: { __typename?: 'Product', id: number, name: string } }> }> };
 
 export type GetBrandQueryVariables = Exact<{
   id: Scalars['Int']['input'];
@@ -1105,6 +1227,124 @@ export function useGoBackStepMutation(baseOptions?: Apollo.MutationHookOptions<G
 export type GoBackStepMutationHookResult = ReturnType<typeof useGoBackStepMutation>;
 export type GoBackStepMutationResult = Apollo.MutationResult<GoBackStepMutation>;
 export type GoBackStepMutationOptions = Apollo.BaseMutationOptions<GoBackStepMutation, GoBackStepMutationVariables>;
+export const CreateBoxDocument = gql`
+    mutation CreateBox($input: BoxInput!) {
+  createBox(input: $input) {
+    id
+    name
+    description
+    parentBoxId
+    boxTypeId
+    createdAt
+    updatedAt
+  }
+}
+    `;
+export type CreateBoxMutationFn = Apollo.MutationFunction<CreateBoxMutation, CreateBoxMutationVariables>;
+
+/**
+ * __useCreateBoxMutation__
+ *
+ * To run a mutation, you first call `useCreateBoxMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateBoxMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createBoxMutation, { data, loading, error }] = useCreateBoxMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateBoxMutation(baseOptions?: Apollo.MutationHookOptions<CreateBoxMutation, CreateBoxMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateBoxMutation, CreateBoxMutationVariables>(CreateBoxDocument, options);
+      }
+export type CreateBoxMutationHookResult = ReturnType<typeof useCreateBoxMutation>;
+export type CreateBoxMutationResult = Apollo.MutationResult<CreateBoxMutation>;
+export type CreateBoxMutationOptions = Apollo.BaseMutationOptions<CreateBoxMutation, CreateBoxMutationVariables>;
+export const UpdateBoxDocument = gql`
+    mutation UpdateBox($id: Int!, $input: BoxUpdateInput!) {
+  updateBox(id: $id, input: $input) {
+    id
+    name
+    description
+    parentBoxId
+    boxTypeId
+    createdAt
+    updatedAt
+  }
+}
+    `;
+export type UpdateBoxMutationFn = Apollo.MutationFunction<UpdateBoxMutation, UpdateBoxMutationVariables>;
+
+/**
+ * __useUpdateBoxMutation__
+ *
+ * To run a mutation, you first call `useUpdateBoxMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateBoxMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateBoxMutation, { data, loading, error }] = useUpdateBoxMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateBoxMutation(baseOptions?: Apollo.MutationHookOptions<UpdateBoxMutation, UpdateBoxMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateBoxMutation, UpdateBoxMutationVariables>(UpdateBoxDocument, options);
+      }
+export type UpdateBoxMutationHookResult = ReturnType<typeof useUpdateBoxMutation>;
+export type UpdateBoxMutationResult = Apollo.MutationResult<UpdateBoxMutation>;
+export type UpdateBoxMutationOptions = Apollo.BaseMutationOptions<UpdateBoxMutation, UpdateBoxMutationVariables>;
+export const RemoveBoxDocument = gql`
+    mutation RemoveBox($id: Int!) {
+  removeBox(id: $id) {
+    id
+    name
+    description
+    parentBoxId
+    boxTypeId
+    createdAt
+    updatedAt
+  }
+}
+    `;
+export type RemoveBoxMutationFn = Apollo.MutationFunction<RemoveBoxMutation, RemoveBoxMutationVariables>;
+
+/**
+ * __useRemoveBoxMutation__
+ *
+ * To run a mutation, you first call `useRemoveBoxMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveBoxMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeBoxMutation, { data, loading, error }] = useRemoveBoxMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useRemoveBoxMutation(baseOptions?: Apollo.MutationHookOptions<RemoveBoxMutation, RemoveBoxMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemoveBoxMutation, RemoveBoxMutationVariables>(RemoveBoxDocument, options);
+      }
+export type RemoveBoxMutationHookResult = ReturnType<typeof useRemoveBoxMutation>;
+export type RemoveBoxMutationResult = Apollo.MutationResult<RemoveBoxMutation>;
+export type RemoveBoxMutationOptions = Apollo.BaseMutationOptions<RemoveBoxMutation, RemoveBoxMutationVariables>;
 export const GetBoxTypeDocument = gql`
     query GetBoxType($id: Int!) {
   boxType(id: $id) {
@@ -1198,6 +1438,115 @@ export type GetBoxTypesQueryHookResult = ReturnType<typeof useGetBoxTypesQuery>;
 export type GetBoxTypesLazyQueryHookResult = ReturnType<typeof useGetBoxTypesLazyQuery>;
 export type GetBoxTypesSuspenseQueryHookResult = ReturnType<typeof useGetBoxTypesSuspenseQuery>;
 export type GetBoxTypesQueryResult = Apollo.QueryResult<GetBoxTypesQuery, GetBoxTypesQueryVariables>;
+export const GetRootBoxesDocument = gql`
+    query GetRootBoxes {
+  rootBoxes {
+    id
+    name
+    description
+    parentBoxId
+    boxTypeId
+    createdAt
+    updatedAt
+    childBoxesCount
+    inventoryItems {
+      id
+      quantity
+      product {
+        id
+        name
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetRootBoxesQuery__
+ *
+ * To run a query within a React component, call `useGetRootBoxesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetRootBoxesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetRootBoxesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetRootBoxesQuery(baseOptions?: Apollo.QueryHookOptions<GetRootBoxesQuery, GetRootBoxesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetRootBoxesQuery, GetRootBoxesQueryVariables>(GetRootBoxesDocument, options);
+      }
+export function useGetRootBoxesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetRootBoxesQuery, GetRootBoxesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetRootBoxesQuery, GetRootBoxesQueryVariables>(GetRootBoxesDocument, options);
+        }
+export function useGetRootBoxesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetRootBoxesQuery, GetRootBoxesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetRootBoxesQuery, GetRootBoxesQueryVariables>(GetRootBoxesDocument, options);
+        }
+export type GetRootBoxesQueryHookResult = ReturnType<typeof useGetRootBoxesQuery>;
+export type GetRootBoxesLazyQueryHookResult = ReturnType<typeof useGetRootBoxesLazyQuery>;
+export type GetRootBoxesSuspenseQueryHookResult = ReturnType<typeof useGetRootBoxesSuspenseQuery>;
+export type GetRootBoxesQueryResult = Apollo.QueryResult<GetRootBoxesQuery, GetRootBoxesQueryVariables>;
+export const GetChildBoxesDocument = gql`
+    query GetChildBoxes($parentBoxId: Int!) {
+  childBoxes(parentBoxId: $parentBoxId) {
+    id
+    name
+    description
+    parentBoxId
+    boxTypeId
+    createdAt
+    updatedAt
+    childBoxesCount
+    inventoryItems {
+      id
+      quantity
+      product {
+        id
+        name
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetChildBoxesQuery__
+ *
+ * To run a query within a React component, call `useGetChildBoxesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetChildBoxesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetChildBoxesQuery({
+ *   variables: {
+ *      parentBoxId: // value for 'parentBoxId'
+ *   },
+ * });
+ */
+export function useGetChildBoxesQuery(baseOptions: Apollo.QueryHookOptions<GetChildBoxesQuery, GetChildBoxesQueryVariables> & ({ variables: GetChildBoxesQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetChildBoxesQuery, GetChildBoxesQueryVariables>(GetChildBoxesDocument, options);
+      }
+export function useGetChildBoxesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetChildBoxesQuery, GetChildBoxesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetChildBoxesQuery, GetChildBoxesQueryVariables>(GetChildBoxesDocument, options);
+        }
+export function useGetChildBoxesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetChildBoxesQuery, GetChildBoxesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetChildBoxesQuery, GetChildBoxesQueryVariables>(GetChildBoxesDocument, options);
+        }
+export type GetChildBoxesQueryHookResult = ReturnType<typeof useGetChildBoxesQuery>;
+export type GetChildBoxesLazyQueryHookResult = ReturnType<typeof useGetChildBoxesLazyQuery>;
+export type GetChildBoxesSuspenseQueryHookResult = ReturnType<typeof useGetChildBoxesSuspenseQuery>;
+export type GetChildBoxesQueryResult = Apollo.QueryResult<GetChildBoxesQuery, GetChildBoxesQueryVariables>;
 export const GetBrandDocument = gql`
     query GetBrand($id: Int!) {
   brand(id: $id) {
